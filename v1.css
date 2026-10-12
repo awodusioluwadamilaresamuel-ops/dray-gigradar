@@ -23,7 +23,6 @@ html[data-theme="light"]{color-scheme:light}
 .field:focus-visible{outline:0}
 @media(max-width:620px){
   .pipeline{grid-template-columns:repeat(3,1fr);row-gap:12px}
-  .theme-btn #themeLabel{display:none}
   .pill{padding:6px 9px}
 }
 @media(prefers-reduced-motion:reduce){.toast{transition:none}}
@@ -71,4 +70,52 @@ html[data-theme="light"]{
 [data-theme="light"] .notice{background:#fbe9e6;border-color:#b3291b}
 @media(max-width:620px){
   [data-theme="light"] .sidebar{background:#ffffffee}
+}
+
+/* ================= Polish pass: icons, hierarchy, type ================= */
+
+/* Stop Android Chrome from inflating some text blocks (caused oversized checklist text) */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+
+/* One consistent line-icon style */
+.ico{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;font-weight:700}
+.btn .ico{width:16px;height:16px}
+.theme-btn{display:inline-flex;align-items:center;gap:6px}
+.theme-btn .ico{width:15px;height:15px}
+html[data-theme="dark"] .ico-moon,html[data-theme="light"] .ico-sun{display:none}
+
+/* Sidebar: icon + label rows */
+.nav button{display:flex;align-items:center;gap:11px;font-weight:600}
+.nav button span{margin:0}
+.nav button .ico{width:19px;height:19px}
+
+/* Quiet secondary buttons so the single lime button reads as the main action */
+.btn:not(.primary){background:transparent}
+.btn:not(.primary):hover{background:var(--soft)}
+[data-theme="light"] .btn:not(.primary){background:transparent}
+[data-theme="light"] .btn:not(.primary):hover{background:var(--soft)}
+.panel-head+.operator-note{margin-top:14px}
+
+/* Outreach checklist: readable size and a proper tap target */
+.checklist{padding:16px 18px;gap:12px;font-size:13px;line-height:1.45}
+.checklist label{display:flex;align-items:flex-start;gap:10px}
+.checklist input{width:18px;height:18px;margin:1px 0 0;flex:none}
+
+/* Floating add button (phones only) */
+.fab{display:none}
+@media(max-width:620px){
+  .fab{display:grid;place-items:center;position:fixed;right:16px;bottom:calc(96px + env(safe-area-inset-bottom));z-index:6;width:54px;height:54px;border-radius:50%;border:0;background:#c7f36b;color:#141911;box-shadow:0 6px 18px #0007}
+  .fab .ico{width:24px;height:24px;stroke-width:2.2}
+  [data-theme="light"] .fab{box-shadow:0 6px 16px #16201a44}
+  .heading .btn,.toolbar #addList,#addPipe{display:none}
+  .pill{display:none}
+  .toast{bottom:calc(100px + env(safe-area-inset-bottom));max-width:calc(100vw - 100px);text-align:center}
+  .main{padding-bottom:150px}
+
+  /* Bottom nav: bigger icons, clear active state */
+  .nav button{flex-direction:column;justify-content:center;gap:3px;min-height:54px;padding:6px 2px;border-radius:12px;font-weight:600}
+  .nav button .ico{width:22px;height:22px}
+  .nav button span{font-size:10px;margin:0}
+  .nav button.active{box-shadow:none;color:var(--lime)}
 }
