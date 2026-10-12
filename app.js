@@ -1,0 +1,305 @@
+(() => {
+  'use strict';
+
+  const Store = window.GigStore;
+  const KEY = 'dray-gigradar-v1';                 // same key as V0, so existing data is kept
+  const META_KEY = 'dray-gigradar-meta';          // schema version and last backup date
+  const PRE_V1_KEY = 'dray-gigradar-pre-v1-copy'; // untouched copy of V0 data, made once
+  const RECOVERY_KEY = 'dray-gigradar-unreadable-copy';
+  const THEME_KEY = 'dray-gigradar-theme';
+  const statuses = Store.STATUSES;
+
+  const $ = id => document.getElementById(id);
+  const money = n => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }).format(Number(n) || 0);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const initials = s => String(s || '?').trim().split(/\s+/).slice(0, 2).map(x => x[0] || '').join('').toUpperCase();
+  const active = l => ['Contacted', 'Replied', 'Negotiating'].includes(l.status);
+  const open = l => !['Won', 'Lost'].includes(l.status);
+  const badge = s => '<span class="badge ' + String(s).toLowerCase() + '">' + esc(s) + '</span>';
+  const blank = (a, b) => '<div class="empty"><b>' + a + '</b>' + b + '</div>';
+
+  // ---------- storage ----------
+  const readStorage = k => { try { return localStorage.getItem(k); } catch { return null; } };
+  const writeStorage = (k, v) => { try { localStorage.setItem(k, v); return true; } catch { return false; } };
+
+  let leads = [];
+  let meta = {};
+  try { meta = JSON.parse(readStorage(META_KEY) || '{}') || {}; } catch { meta = {}; }
+  const savedMeta = () => writeStorage(META_KEY, JSON.stringify(meta));
+
+  function loadLeads() {
+    const raw = readStorage(KEY);
+    const result = Store.parseStored(raw);
+    if (result.damaged) {
+      // Keep the unreadable text so nothing is lost, and tell the person.
+      if (readStorage(RECOVERY_KEY) == null) writeStorage(RECOVERY_KEY, raw);
+      showNotice('Your saved records could not be read. A recovery copy was kept on this device.', raw);
+      return [];
+    }
+    if (raw && !meta.schema) writeStorage(PRE_V1_KEY, raw); // one-time safety copy before upgrading
+    if (!meta.schema) { meta.schema = Store.SCHEMA; savedMeta(); }
+    return result.leads;
+  }
+
+  function showNotice(text, recoveryText) {
+    $('noticeText').textContent = text;
+    $('notice').hidden = false;
+    $('downloadRecovery').hidden = !recoveryText;
+    $('downloadRecovery').onclick = () => download('gigradar-recovery-copy.txt', recoveryText, 'text/plain');
+  }
+
+  function download(filename, text, type) {
+    const url = URL.createObjectURL(new Blob([text], { type }));
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  let toastTimer;
+  function toast(text, isError) {
+    const t = $('toast');
+    t.textContent = text;
+    t.classList.toggle('error', !!isError);
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), isError ? 4000 : 2000);
+  }
+
+  function save() {
+    const ok = writeStorage(KEY, JSON.stringify(leads));
+    render();
+    if (ok) toast('Saved on this device');
+    else toast('Could not save. Check browser storage settings, then export a backup.', true);
+    return ok;
+  }
+
+  const sorted = () => [...leads].sort((a, b) => b.updated - a.updated);
+
+  // ---------- rendering ----------
+  function row(l) {
+    return '<div class="row"><div class="row-left"><div class="logo">' + esc(initials(l.name)) + '</div><div style="min-width:0"><div class="name">' + esc(l.name) +
+      '</div><div class="meta">' + esc(l.service) + ' · ' + esc(l.chain) + '</div></div></div><div class="right">' + badge(l.status) +
+      ' <button class="icon-btn" data-edit="' + esc(l.id) + '">Edit</button></div></div>';
+  }
+
+  function links(l) {
+    const out = [];
+    if (l.website) out.push('<a href="' + esc(l.website) + '" target="_blank" rel="noopener noreferrer">' + esc(l.website.replace(/^https?:\/\/(www\.)?/, '')) + '</a>');
+    if (l.xHandle) out.push('<a href="https://x.com/' + esc(l.xHandle.slice(1)) + '" target="_blank" rel="noopener noreferrer">' + esc(l.xHandle) + '</a>');
+    return out.length ? '<div class="meta links">' + out.join(' · ') + '</div>' : '';
+  }
+
+  function render() {
+    const total = leads.length;
+    const act = leads.filter(active).length;
+    const sum = list => list.reduce((s, l) => s + (+l.value || 0), 0);
+    const earned = sum(leads.filter(l => l.status === 'Won' && l.payment === 'Paid'));
+    const pending = sum(leads.filter(l => l.status === 'Won' && l.payment !== 'Paid'));
+    const potential = sum(leads.filter(open));
+    const wins = leads.filter(l => l.status === 'Won').length;
+    const today = Store.todayStr();
+
+    $('sLeads').textContent = total;
+    $('sActive').textContent = act;
+    $('sPotential').textContent = money(potential);
+    $('sEarned').textContent = money(earned);
+    $('sWon').textContent = wins + ' gigs won';
+
+    $('bars').innerHTML = statuses.map(s => {
+      const n = leads.filter(l => l.status === s).length;
+      return '<div class="stage">' + s + ' <b>' + n + '</b><div class="bar"><span style="width:' + (total ? Math.max(n ? 8 : 0, n / total * 100) : 0) + '%"></span></div></div>';
+    }).join('');
+
+    $('recent').innerHTML = sorted().slice(0, 4).map(row).join('') || blank('Your radar is clear.', 'Add a project you want to investigate.');
+
+    const due = sorted().filter(l => open(l) && l.followup).sort((a, b) => a.followup.localeCompare(b.followup)).slice(0, 5);
+    $('followups').innerHTML = due.map(l => {
+      const late = l.followup < today;
+      return '<div class="row"><div><div class="name">' + esc(l.name) + '</div><div class="meta' + (late ? ' overdue' : '') + '">' +
+        (late ? 'Overdue: ' : 'Follow up: ') + esc(l.followup) + '</div></div><button class="icon-btn" data-edit="' + esc(l.id) + '">Open</button></div>';
+    }).join('') || blank('No follow-ups scheduled.', 'Add a date so good leads do not go cold.');
+
+    const overdueCount = due.filter(l => l.followup < today).length;
+    $('noteText').textContent = !total ? 'Your first goal is not 100 leads. It is 5 well-researched projects and 5 thoughtful approaches.'
+      : overdueCount ? overdueCount + ' follow-up(s) are overdue. Handle those before adding new leads.'
+      : !act ? 'You have leads but no active conversations. Pick the strongest one and make a specific, useful approach.'
+      : due.length ? 'You have follow-ups scheduled. Keep them tied to a real next step.'
+      : 'You have ' + act + ' active conversation(s). Give each one a clear next action.';
+
+    const q = ($('search').value || '').toLowerCase(), filter = $('filter').value;
+    const filtered = sorted().filter(l => (!filter || l.status === filter) &&
+      [l.name, l.chain, l.contact, l.service, l.gap, l.website, l.xHandle].join(' ').toLowerCase().includes(q));
+    $('leadTable').innerHTML = filtered.map(l => '<tr><td><b>' + esc(l.name) + '</b><div class="meta">' + esc(l.contact || l.service) + '</div>' + links(l) + '</td><td>' + esc(l.chain) +
+      '</td><td>' + badge(l.status) + '</td><td>' + money(l.value) + '</td><td>' + esc(l.followup || 'Not set') +
+      '</td><td><button class="icon-btn" data-edit="' + esc(l.id) + '">Edit</button> <button class="icon-btn" data-delete="' + esc(l.id) + '" aria-label="Delete ' + esc(l.name) + '">×</button></td></tr>').join('');
+    $('leadEmpty').hidden = !!filtered.length;
+
+    const conversations = sorted().filter(l => !['New', 'Lost'].includes(l.status));
+    $('outreachRows').innerHTML = conversations.map(l => '<div class="row"><div style="min-width:0"><div class="name">' + esc(l.name) +
+      ' <span style="color:var(--muted);font-weight:400">' + esc(l.contact) + '</span></div><div class="meta">' + esc(l.next || l.gap || 'Add your next action in the lead notes.') +
+      '</div></div><div class="right">' + badge(l.status) + ' <button class="icon-btn" data-edit="' + esc(l.id) + '">Update</button></div></div>').join('')
+      || blank('No conversations yet.', 'Update a lead to Contacted after sending a thoughtful pitch.');
+
+    $('pStats').innerHTML = [['New leads', leads.filter(l => l.status === 'New').length], ['In conversation', act], ['Won gigs', wins], ['Lost / closed', leads.filter(l => l.status === 'Lost').length]]
+      .map(a => '<article class="stat"><label>' + a[0] + '</label><strong>' + a[1] + '</strong></article>').join('');
+    $('pipeRows').innerHTML = sorted().map(row).join('') || blank('Your pipeline is empty.', 'Add a lead to start tracking it.');
+
+    $('iEarned').textContent = money(earned);
+    $('iPending').textContent = money(pending);
+    $('iPipeline').textContent = money(potential);
+    const wonRows = sorted().filter(l => l.status === 'Won');
+    $('incomeTable').innerHTML = wonRows.map(l => '<tr><td>' + esc(l.name) + '</td><td>' + badge(l.status) + '</td><td>' + money(l.value) + '</td><td>' + esc(l.payment) +
+      '</td><td><button class="icon-btn" data-edit="' + esc(l.id) + '">Edit</button></td></tr>').join('');
+    $('incomeEmpty').hidden = !!wonRows.length;
+
+    renderBackupInfo();
+  }
+
+  function renderBackupInfo() {
+    const when = meta.lastBackup ? new Date(meta.lastBackup).toLocaleString() : null;
+    $('backupInfo').textContent = when ? 'Last backup: ' + when + '. Records live only in this browser.'
+      : leads.length ? 'No backup yet. Records live only in this browser, so export a copy now.'
+      : 'Records live only in this browser. Export a copy regularly.';
+    $('backupInfo').classList.toggle('overdue', !when && leads.length > 0);
+  }
+
+  // ---------- form ----------
+  const FIELDS = ['name', 'chain', 'website', 'xHandle', 'contact', 'service', 'status', 'value', 'followup', 'payment', 'gap', 'next'];
+  const ERROR_FIELDS = ['name', 'website', 'xHandle'];
+
+  function clearErrors() {
+    ERROR_FIELDS.forEach(f => {
+      $('err-' + f).hidden = true; $('err-' + f).textContent = '';
+      $(f).removeAttribute('aria-invalid');
+    });
+  }
+
+  function openModal(l) {
+    $('form').reset();
+    clearErrors();
+    $('editId').value = l?.id || '';
+    $('modalTitle').textContent = l ? 'Update opportunity' : 'Track an opportunity';
+    if (l) FIELDS.forEach(f => { if (l[f] !== undefined) $(f).value = l[f]; });
+    $('modal').classList.add('open');
+    setTimeout(() => $('name').focus(), 50);
+  }
+  const closeModal = () => $('modal').classList.remove('open');
+
+  function showFieldError(field, message, duplicateLead) {
+    const el = $('err-' + field);
+    el.textContent = message;
+    if (duplicateLead) {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'text-btn'; b.textContent = 'Open existing';
+      b.dataset.edit = duplicateLead.id;
+      el.append(' ', b);
+    }
+    el.hidden = false;
+    $(field).setAttribute('aria-invalid', 'true');
+  }
+
+  $('form').onsubmit = e => {
+    e.preventDefault();
+    clearErrors();
+    const id = $('editId').value;
+    const old = leads.find(l => l.id === id);
+    const input = {};
+    FIELDS.forEach(f => { input[f] = $(f).value; });
+    input.id = id || Store.newId();
+    input.created = old?.created || Date.now();
+    input.updated = Date.now();
+
+    const result = Store.validateLead(input, leads, id || null);
+    if (!result.ok) {
+      Object.entries(result.errors).forEach(([f, msg]) => showFieldError(f, msg, f === 'name' ? result.duplicate : null));
+      $(Object.keys(result.errors)[0]).focus();
+      return;
+    }
+    leads = old ? leads.map(x => x.id === id ? result.lead : x) : [result.lead, ...leads];
+    closeModal();
+    save();
+  };
+
+  // ---------- navigation ----------
+  const titles = { overview: 'Overview', leads: 'Project leads', outreach: 'Outreach', pipeline: 'Gig pipeline', income: 'Income' };
+  function go(v) {
+    document.querySelectorAll('.view').forEach(x => x.classList.toggle('active', x.id === 'view-' + v));
+    document.querySelectorAll('[data-view]').forEach(x => x.classList.toggle('active', x.dataset.view === v));
+    $('crumb').textContent = titles[v];
+    window.scrollTo(0, 0);
+  }
+
+  // ---------- backup ----------
+  $('exportBtn').onclick = () => {
+    const stamp = Store.todayStr();
+    download('gigradar-backup-' + stamp + '.json', Store.buildExport(leads), 'application/json');
+    meta.lastBackup = Date.now();
+    savedMeta();
+    renderBackupInfo();
+    $('dataMsg').textContent = 'Exported ' + leads.length + ' lead(s) to gigradar-backup-' + stamp + '.json.';
+  };
+
+  $('importBtn').onclick = () => $('importFile').click();
+  $('importFile').onchange = async e => {
+    const file = e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    const msg = $('dataMsg');
+    let text;
+    try { text = await file.text(); } catch { msg.textContent = 'Could not read that file.'; return; }
+    const parsed = Store.parseImport(text);
+    if (!parsed.ok) { msg.textContent = parsed.error; return; }
+    const r = Store.mergeImport(leads, parsed.leads);
+    leads = r.merged;
+    const saved = save();
+    msg.textContent = (saved ? 'Import finished: ' : 'Import not saved to storage: ') + r.added + ' added, ' + r.updated + ' updated, ' + r.duplicates + ' skipped as duplicates' +
+      (parsed.skippedInvalid ? ', ' + parsed.skippedInvalid + ' ignored (no project name)' : '') + '.';
+  };
+
+  // ---------- theme ----------
+  function applyTheme(theme, persist) {
+    const light = theme === 'light';
+    document.documentElement.setAttribute('data-theme', light ? 'light' : 'dark');
+    $('themeIcon').textContent = light ? '☾' : '☀';
+    $('themeLabel').textContent = light ? 'Dark' : 'Light';
+    $('themeToggle').setAttribute('aria-pressed', String(light));
+    $('themeToggle').setAttribute('aria-label', light ? 'Switch to dark mode' : 'Switch to light mode');
+    document.querySelector('meta[name="theme-color"]').setAttribute('content', light ? '#f4f7f1' : '#101411');
+    if (persist) writeStorage(THEME_KEY, light ? 'light' : 'dark');
+  }
+  $('themeToggle').onclick = () => applyTheme(document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light', true);
+
+  // ---------- wiring ----------
+  document.querySelectorAll('[data-view]').forEach(b => b.onclick = () => go(b.dataset.view));
+  document.querySelectorAll('[data-goto]').forEach(b => b.onclick = () => go(b.dataset.goto));
+  ['sideAdd', 'addTop', 'addList', 'quickAdd', 'addPipe'].forEach(id => $(id).onclick = () => openModal());
+  $('close').onclick = $('cancel').onclick = closeModal;
+  $('modal').onclick = e => { if (e.target === $('modal')) closeModal(); };
+  document.onkeydown = e => { if (e.key === 'Escape') closeModal(); };
+  $('search').oninput = render;
+  $('filter').onchange = render;
+
+  document.addEventListener('click', e => {
+    let b = e.target.closest('[data-edit]');
+    if (b) {
+      const l = leads.find(x => x.id === b.dataset.edit);
+      if (l) openModal(l);
+      return;
+    }
+    b = e.target.closest('[data-delete]');
+    if (b) {
+      const l = leads.find(x => x.id === b.dataset.delete);
+      if (l && confirm('Delete ' + l.name + '? This cannot be undone. Export a backup first if unsure.')) {
+        leads = leads.filter(x => x.id !== l.id);
+        save();
+      }
+    }
+  });
+
+  // ---------- start ----------
+  applyTheme(document.documentElement.getAttribute('data-theme'), false);
+  leads = loadLeads();
+  render();
+})();
+  
