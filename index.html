@@ -1,85 +1,474 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#101411">
-<title>GigRadar — Dray's opportunity desk</title>
+<title>GigRadar V1 — Web3 Opportunity Desk</title>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <div class="app">
   <aside class="sidebar">
-    <div class="brand"><span class="brand-mark">G</span><div><b>GigRadar<span>.</span></b><small>DRAY'S OPPORTUNITY DESK</small></div></div>
+    <div class="brand">
+      <span class="brand-mark">G</span>
+      <div><b>GigRadar<span>.V1</span></b><small>OPPORTUNITY DESK</small></div>
+    </div>
     <div class="nav-label">WORKSPACE</div>
     <nav class="nav">
       <button class="active" data-view="overview">▦ <span>Overview</span></button>
-      <button data-view="leads">⌕ <span>Project leads</span></button>
+      <button data-view="discovery">⌕ <span>Discovery</span></button>
+      <button data-view="leads">◫ <span>Project leads</span></button>
+      <button data-view="queue">⌛ <span>Research queue</span></button>
       <button data-view="outreach">↗ <span>Outreach</span></button>
-      <button data-view="pipeline">◫ <span>Gig pipeline</span></button>
       <button data-view="income">＄ <span>Income</span></button>
     </nav>
-    <div class="operator-tip"><small>THE OPERATOR RULE</small><p>Don't just ask for a gig. Find a gap, show the fix, and make it easy to say yes.</p><button class="btn primary" id="sideAdd">＋ Add opportunity</button></div>
+    <div class="operator-tip">
+      <small>THE OPERATOR RULE</small>
+      <p>Don't just ask for a gig. Find an observable gap, propose a specific fix, and make it easy to say yes.</p>
+      <button class="btn primary full-btn" id="sideAdd">＋ Add opportunity</button>
+    </div>
   </aside>
+
   <main class="main">
-    <header class="topbar"><span>Workspace / <b id="crumb">Overview</b></span><span class="pill"><i></i> Operator mode</span></header>
-    <section class="view active" id="view-overview">
-      <div class="heading"><div><h1>Opportunity desk<span>.</span></h1><p>Less scrolling. Better targets. <strong>More paid work.</strong></p></div><button class="btn primary" id="addTop">＋ Add lead</button></div>
-      <div class="stats">
-        <article class="stat"><label>Total opportunities</label><strong id="sLeads">0</strong><small>Projects worth investigating</small></article>
-        <article class="stat"><label>Active conversations</label><strong id="sActive">0</strong><small>Contacted, replied or negotiating</small></article>
-        <article class="stat"><label>Potential value</label><strong id="sPotential">$0</strong><small>Estimated open lead value</small></article>
-        <article class="stat"><label>Earned so far</label><strong id="sEarned">$0</strong><small id="sWon">0 gigs won</small></article>
+    <header class="topbar">
+      <span>Workspace / <b id="crumb">Overview</b></span>
+      <div class="topbar-actions">
+        <button class="icon-btn" id="btnExport" title="Export JSON backup">⬇ Export data</button>
+        <button class="icon-btn" id="btnImportTrigger" title="Import JSON data">⬆ Import</button>
+        <input type="file" id="fileImport" accept=".json" hidden>
+        <span class="pill"><i></i> Operator mode</span>
       </div>
+    </header>
+
+    <!-- VIEW: OVERVIEW -->
+    <section class="view active" id="view-overview">
+      <div class="heading">
+        <div>
+          <h1>Opportunity desk<span>.</span></h1>
+          <p>Targeted discovery. Observable signals. <strong>More paid Web3 gigs.</strong></p>
+        </div>
+        <div class="head-btns">
+          <button class="btn" id="btnAssistedTop">⚡ Quick import</button>
+          <button class="btn primary" id="addTop">＋ Add lead</button>
+        </div>
+      </div>
+
+      <div class="stats">
+        <article class="stat">
+          <label>Total projects</label>
+          <strong id="sLeads">0</strong>
+          <small>Tracked in workspace</small>
+        </article>
+        <article class="stat">
+          <label>High-score opportunities</label>
+          <strong id="sHighScore">0</strong>
+          <small>Score 70+ verified leads</small>
+        </article>
+        <article class="stat">
+          <label>Active conversations</label>
+          <strong id="sActive">0</strong>
+          <small>Contacted / Negotiating</small>
+        </article>
+        <article class="stat">
+          <label>Potential value</label>
+          <strong id="sPotential">$0</strong>
+          <small id="sWon">0 gigs won</small>
+        </article>
+      </div>
+
       <div class="dashboard-grid">
         <div>
-          <section class="panel"><div class="panel-head"><div><b>Your gig pipeline</b><p>See where opportunities are getting stuck.</p></div><button class="text-btn" data-goto="pipeline">View all ↗</button></div><div class="pipeline" id="bars"></div></section>
-          <section class="panel"><div class="panel-head"><div><b>Recently tracked</b><p>Projects on your radar right now.</p></div><button class="text-btn" data-goto="leads">All leads ↗</button></div><div id="recent" class="rows"></div></section>
-        </div>
-        <div>
-          <section class="panel"><div class="panel-head"><div><b>Quick actions</b><p>Keep the hunt moving.</p></div></div>
-            <div class="quick-grid"><button class="quick" id="quickAdd"><b>＋ Track a project</b><small>Save a promising lead</small></button><button class="quick" data-goto="outreach"><b>↗ Log outreach</b><small>Track a conversation</small></button><button class="quick" data-goto="pipeline"><b>◫ Review pipeline</b><small>Find your next move</small></button><button class="quick" data-goto="income"><b>＄ Record earnings</b><small>Keep money accountable</small></button></div>
-            <div class="operator-note"><small>OPERATOR'S NOTE</small><p id="noteText">Your first goal isn't 100 leads. It's 5 well-researched projects and 5 thoughtful approaches.</p></div>
+          <section class="panel">
+            <div class="panel-head">
+              <div><b>Pipeline distribution</b><p>Track opportunity progression by stage.</p></div>
+              <button class="text-btn" data-goto="leads">View all leads ↗</button>
+            </div>
+            <div class="pipeline" id="bars"></div>
           </section>
-          <section class="panel"><div class="panel-head"><div><b>Follow-up discipline</b><p>Open opportunities needing a next step.</p></div></div><div id="followups" class="rows"></div></section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <div><b>Top priority targets</b><p>Ranked by opportunity score & signal strength.</p></div>
+              <button class="text-btn" data-goto="leads">All leads ↗</button>
+            </div>
+            <div id="topTargets" class="rows"></div>
+          </section>
+        </div>
+
+        <div>
+          <section class="panel">
+            <div class="panel-head">
+              <div><b>Quick actions</b><p>Execute your operator workflow.</p></div>
+            </div>
+            <div class="quick-grid">
+              <button class="quick" id="quickAdd"><b>＋ Track project</b><small>Manual discovery record</small></button>
+              <button class="quick" data-goto="discovery"><b>⚡ Import / Scan</b><small>Assisted discovery</small></button>
+              <button class="quick" data-goto="queue"><b>⌛ Research queue</b><small>Verify unconfirmed signals</small></button>
+              <button class="quick" data-goto="outreach"><b>↗ Pitch generator</b><small>Draft context outreach</small></button>
+            </div>
+            <div class="operator-note">
+              <small>OPERATOR'S NOTE</small>
+              <p id="noteText">Your goal is not 100 cold emails. It is 5 high-signal targets with customized value propositions.</p>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <div><b>Scheduled follow-ups</b><p>Keep active conversations warm.</p></div>
+            </div>
+            <div id="followups" class="rows"></div>
+          </section>
         </div>
       </div>
-      <footer>GigRadar V0 · Records are stored in this browser on this device.</footer>
     </section>
+
+    <!-- VIEW: DISCOVERY -->
+    <section class="view" id="view-discovery">
+      <div class="view-title">
+        <h2>Project discovery & import</h2>
+        <p>Source candidates via manual entry, link imports, or public ecosystem sources.</p>
+      </div>
+
+      <div class="discovery-grid">
+        <!-- Assisted Link / Text Import Panel -->
+        <section class="panel">
+          <div class="panel-head">
+            <div><b>Assisted Discovery (Link & Text Parser)</b><p>Paste public project links, tweets, or website URLs to extract records.</p></div>
+          </div>
+          <div class="panel-body">
+            <div class="group full">
+              <label for="importRawText">Paste public links or project text notes:</label>
+              <textarea class="field" id="importRawText" rows="4" placeholder="e.g. Apex Protocol - https://apex.xyz - @apex_xyz - Hiring community moderators for mainnet launch!"></textarea>
+            </div>
+            <div class="group-row" style="margin-top:10px;">
+              <select class="field" id="importCategory">
+                <option value="DeFi">DeFi</option>
+                <option value="Infrastructure">Infrastructure</option>
+                <option value="Gaming / Metaverse">Gaming / Metaverse</option>
+                <option value="NFT / Culture">NFT / Culture</option>
+                <option value="AI / Data">AI / Data</option>
+                <option value="DAO / Social">DAO / Social</option>
+                <option value="Other">Other</option>
+              </select>
+              <button class="btn primary" id="btnProcessImport">Parse & add candidate</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Automated Public Feed Fetcher -->
+        <section class="panel">
+          <div class="panel-head">
+            <div><b>Automated Public Directory Source</b><p>Discover recent public project candidates from public feeds.</p></div>
+          </div>
+          <div class="panel-body">
+            <p class="form-hint" style="margin-bottom:12px;">Fetch project records from public ecosystem directories without API keys.</p>
+            <div class="group-row">
+              <select class="field" id="publicSourceSelect">
+                <option value="defillama">DefiLlama (Recent Protocols)</option>
+                <option value="github">GitHub Web3 Repositories</option>
+              </select>
+              <button class="btn" id="btnFetchPublicFeed">Fetch candidates</button>
+            </div>
+            <div id="publicFeedResults" class="feed-results-list" style="margin-top:14px;"></div>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <!-- VIEW: LEADS -->
     <section class="view" id="view-leads">
-      <div class="view-title"><h2>Project leads</h2><p>Track projects, spot gaps, and pitch with purpose.</p></div>
-      <section class="panel"><div class="toolbar"><input class="field" id="search" placeholder="Search project, chain, contact…"><select class="field" id="filter"><option value="">All statuses</option><option>New</option><option>Contacted</option><option>Replied</option><option>Negotiating</option><option>Won</option><option>Lost</option></select><button class="btn primary" id="addList">＋ Add lead</button></div>
-      <div class="table-wrap"><table><thead><tr><th>PROJECT / CONTACT</th><th>CHAIN</th><th>STATUS</th><th>VALUE</th><th>FOLLOW-UP</th><th>ACTIONS</th></tr></thead><tbody id="leadTable"></tbody></table></div><div class="empty" id="leadEmpty" hidden><b>No leads match that search.</b>Try another keyword or add a project.</div></section>
+      <div class="view-title">
+        <h2>Project leads workspace</h2>
+        <p>Filter, evaluate scores, and inspect observable opportunity signals.</p>
+      </div>
+      <section class="panel">
+        <div class="toolbar">
+          <input class="field" id="search" placeholder="Search name, chain, handle, gap…">
+          <select class="field" id="filterStatus">
+            <option value="">All statuses</option>
+            <option>New</option>
+            <option>Researching</option>
+            <option>Qualified</option>
+            <option>Ready to contact</option>
+            <option>Contacted</option>
+            <option>Replied</option>
+            <option>Negotiating</option>
+            <option>Won</option>
+            <option>Lost</option>
+          </select>
+          <select class="field" id="filterChain">
+            <option value="">All chains</option>
+            <option>Solana</option>
+            <option>Ethereum / EVM</option>
+            <option>Base</option>
+            <option>Arbitrum / Optimism</option>
+            <option>TON</option>
+            <option>Other</option>
+          </select>
+          <button class="btn primary" id="addList">＋ Add lead</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>PROJECT / WEBSITE</th>
+                <th>CHAIN & CAT</th>
+                <th>SCORE</th>
+                <th>SIGNAL TYPE</th>
+                <th>STATUS</th>
+                <th>VALUE</th>
+                <th>ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody id="leadTable"></tbody>
+          </table>
+        </div>
+        <div class="empty" id="leadEmpty" hidden>
+          <b>No project leads matched your search.</b><p>Try adjusting your filters or import a candidate project.</p>
+        </div>
+      </section>
     </section>
+
+    <!-- VIEW: RESEARCH QUEUE -->
+    <section class="view" id="view-queue">
+      <div class="view-title">
+        <h2>Research & verification queue</h2>
+        <p>Investigate unverified leads, confirm contact channels, and collect signal evidence.</p>
+      </div>
+      <section class="panel">
+        <div class="panel-head">
+          <div><b>Unverified & Incomplete Candidates</b><p>Resolve missing details before initiating outreach.</p></div>
+        </div>
+        <div id="queueRows" class="rows"></div>
+      </section>
+    </section>
+
+    <!-- VIEW: OUTREACH -->
     <section class="view" id="view-outreach">
-      <div class="view-title"><h2>Outreach tracker</h2><p>Every pitch needs context, a reason, and a next step. No copy-paste spam.</p></div>
-      <section class="panel"><div class="panel-head"><div><b>Conversation board</b><p>Update status from your project leads.</p></div><button class="btn" data-goto="leads">＋ Find leads</button></div><div id="outreachRows" class="rows"></div></section>
-      <section class="panel"><div class="panel-head"><div><b>Before you hit send</b><p>Quick quality check</p></div></div><div class="checklist"><label><input type="checkbox"> I identified a specific gap or opportunity.</label><label><input type="checkbox"> I can explain how my work would help.</label><label><input type="checkbox"> My message is short, personal, and easy to answer.</label><label><input type="checkbox"> I recorded when and how I'll follow up.</label></div></section>
+      <div class="view-title">
+        <h2>Outreach tracker & pitch generator</h2>
+        <p>Draft tailored messages grounded in observable project gaps.</p>
+      </div>
+
+      <div class="dashboard-grid">
+        <section class="panel">
+          <div class="panel-head">
+            <div><b>Active conversations</b><p>Track ongoing outreach status and response flow.</p></div>
+            <button class="btn" data-goto="leads">Manage leads ↗</button>
+          </div>
+          <div id="outreachRows" class="rows"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div><b>Pitch draft generator</b><p>Select a lead to generate a customized draft.</p></div>
+          </div>
+          <div class="panel-body">
+            <div class="group">
+              <label for="pitchLeadSelect">Select Target Lead:</label>
+              <select class="field" id="pitchLeadSelect"><option value="">-- Choose project --</option></select>
+            </div>
+            <div class="group" style="margin-top:10px;">
+              <label for="pitchAngle">Approach Angle:</label>
+              <select class="field" id="pitchAngle">
+                <option value="gap">Highlighting Observed Gap</option>
+                <option value="launch">Campaign / Launch Support</option>
+                <option value="mod">Community Moderation & Safety</option>
+                <option value="growth">Growth & Social Engagement</option>
+              </select>
+            </div>
+            <div class="group" style="margin-top:10px;">
+              <label for="pitchOutput">Generated Draft (Editable):</label>
+              <textarea class="field" id="pitchOutput" rows="7" placeholder="Select a project above to generate a draft..."></textarea>
+            </div>
+            <button class="btn primary" id="btnCopyPitch" style="margin-top:10px; width:100%;">Copy message to clipboard</button>
+          </div>
+        </section>
+      </div>
     </section>
-    <section class="view" id="view-pipeline">
-      <div class="view-title"><h2>Gig pipeline</h2><p>Move from promising project to scope, agreed payment, and delivery.</p></div>
-      <div class="stats pipeline-stats" id="pStats"></div>
-      <section class="panel"><div class="panel-head"><div><b>All opportunities</b><p>Update stage as the conversation progresses.</p></div><button class="btn primary" id="addPipe">＋ Add lead</button></div><div id="pipeRows" class="rows"></div></section>
-    </section>
+
+    <!-- VIEW: INCOME -->
     <section class="view" id="view-income">
-      <div class="view-title"><h2>Income tracker</h2><p>Track what you've earned, what's pending, and work in progress.</p></div>
-      <div class="money-grid"><article class="money-card"><small>Total earned</small><strong id="iEarned">$0</strong><small>Completed and paid gigs</small></article><article class="money-card"><small>Payments pending</small><strong id="iPending">$0</strong><small>Won gigs not marked paid</small></article><article class="money-card"><small>Open pipeline</small><strong id="iPipeline">$0</strong><small>Estimated active lead value</small></article></div>
-      <section class="panel"><div class="panel-head"><div><b>Gig and payment records</b><p>Mark a lead Won and set its value to track it here.</p></div><button class="btn" data-goto="leads">Manage leads ↗</button></div><div class="table-wrap"><table><thead><tr><th>PROJECT</th><th>STATUS</th><th>VALUE</th><th>PAYMENT</th><th>ACTION</th></tr></thead><tbody id="incomeTable"></tbody></table></div><div class="empty" id="incomeEmpty"><b>No gig payments recorded yet.</b>Track your first opportunity and keep building.</div></section>
+      <div class="view-title">
+        <h2>Income & revenue tracker</h2>
+        <p>Track closed gigs, pending payments, and pipeline valuation.</p>
+      </div>
+      <div class="money-grid">
+        <article class="money-card">
+          <small>Total earned</small>
+          <strong id="iEarned">$0</strong>
+          <small>Completed and paid gigs</small>
+        </article>
+        <article class="money-card">
+          <small>Payments pending</small>
+          <strong id="iPending">$0</strong>
+          <small>Won gigs awaiting payment</small>
+        </article>
+        <article class="money-card">
+          <small>Open pipeline potential</small>
+          <strong id="iPipeline">$0</strong>
+          <small>Estimated open lead value</small>
+        </article>
+      </div>
+      <section class="panel">
+        <div class="panel-head">
+          <div><b>Won Gigs & Financial Records</b><p>Track won opportunities and payment clearance.</p></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>PROJECT</th>
+                <th>STATUS</th>
+                <th>AGREED VALUE</th>
+                <th>PAYMENT STATUS</th>
+                <th>ACTION</th>
+              </tr>
+            </thead>
+            <tbody id="incomeTable"></tbody>
+          </table>
+        </div>
+        <div class="empty" id="incomeEmpty">
+          <b>No revenue records logged yet.</b>Mark an opportunity as Won to track income here.
+        </div>
+      </section>
     </section>
   </main>
 </div>
-<div class="modal-backdrop" id="modal"><div class="modal"><div class="modal-head"><b id="modalTitle">Track an opportunity</b><button class="icon-btn" id="close">✕</button></div>
-<form id="form"><div class="modal-body"><input type="hidden" id="editId"><div class="form-grid">
-  <div class="group"><label for="name">Project name *</label><input class="field" id="name" required maxlength="90" placeholder="Solana protocol"></div>
-  <div class="group"><label for="chain">Chain / ecosystem</label><select class="field" id="chain"><option>Solana</option><option>Ethereum / EVM</option><option>Base</option><option>TON</option><option>Other</option></select></div>
-  <div class="group"><label for="contact">Contact / X handle</label><input class="field" id="contact" maxlength="100" placeholder="@founder or community lead"></div>
-  <div class="group"><label for="service">Potential service</label><select class="field" id="service"><option>Community growth</option><option>Community management</option><option>Social media</option><option>Growth strategy</option><option>Raid / engagement campaign</option><option>Project management</option><option>Other</option></select></div>
-  <div class="group"><label for="status">Pipeline status</label><select class="field" id="status"><option>New</option><option>Contacted</option><option>Replied</option><option>Negotiating</option><option>Won</option><option>Lost</option></select></div>
-  <div class="group"><label for="value">Estimated / agreed value (USD)</label><input class="field" id="value" type="number" min="0" step=".01" placeholder="0.00"></div>
-  <div class="group"><label for="followup">Next follow-up date</label><input class="field" id="followup" type="date"></div>
-  <div class="group"><label for="payment">Payment status</label><select class="field" id="payment"><option>Not agreed</option><option>Pending</option><option>Paid</option></select></div>
-  <div class="group full"><label for="gap">Observed gap / why approach them?</label><textarea class="field" id="gap" rows="2" maxlength="500" placeholder="What could be improved? What did you actually notice?"></textarea></div>
-  <div class="group full"><label for="next">Next action / notes</label><textarea class="field" id="next" rows="2" maxlength="500" placeholder="Review onboarding, then send one specific suggestion."></textarea></div>
-</div><p class="form-hint">Record real observations. An estimate is not an agreed fee.</p><div class="modal-actions"><button class="btn" type="button" id="cancel">Cancel</button><button class="btn primary" type="submit">Save opportunity</button></div></div></form></div></div>
+
+<!-- MODAL: ADD / EDIT OPPORTUNITY -->
+<div class="modal-backdrop" id="modal">
+  <div class="modal">
+    <div class="modal-head">
+      <b id="modalTitle">Track an opportunity</b>
+      <button class="icon-btn" id="close">✕</button>
+    </div>
+    <form id="form">
+      <div class="modal-body">
+        <input type="hidden" id="editId">
+        <div class="form-grid">
+          <div class="group">
+            <label for="name">Project Name *</label>
+            <input class="field" id="name" required maxlength="90" placeholder="e.g. Apex Protocol">
+          </div>
+          <div class="group">
+            <label for="website">Website URL</label>
+            <input class="field" id="website" type="url" placeholder="https://apex.xyz">
+          </div>
+          <div class="group">
+            <label for="chain">Ecosystem / Chain</label>
+            <select class="field" id="chain">
+              <option>Solana</option>
+              <option>Ethereum / EVM</option>
+              <option>Base</option>
+              <option>Arbitrum / Optimism</option>
+              <option>TON</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="group">
+            <label for="category">Category</label>
+            <select class="field" id="category">
+              <option>DeFi</option>
+              <option>Infrastructure</option>
+              <option>Gaming / Metaverse</option>
+              <option>NFT / Culture</option>
+              <option>AI / Data</option>
+              <option>DAO / Social</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="group">
+            <label for="contact">Contact Handle / Outreach Channel</label>
+            <input class="field" id="contact" maxlength="100" placeholder="@founder or TG link">
+          </div>
+          <div class="group">
+            <label for="contactVerified">Contact Verification</label>
+            <select class="field" id="contactVerified">
+              <option value="unverified">Unverified Channel</option>
+              <option value="verified">Verified Official Contact</option>
+            </select>
+          </div>
+          <div class="group">
+            <label for="service">Target Service Needed</label>
+            <select class="field" id="service">
+              <option>Community Growth</option>
+              <option>Community Management / Mod</option>
+              <option>Social Media Management</option>
+              <option>Growth Strategy & Campaigns</option>
+              <option>Raid / Engagement Coordination</option>
+              <option>Project Management</option>
+              <option>Content / Narrative Creation</option>
+              <option>Partnerships & Outreach</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="group">
+            <label for="signalType">Opportunity Signal Type</label>
+            <select class="field" id="signalType">
+              <option value="explicit_hiring">Explicit Hiring Call / Job Post</option>
+              <option value="campaign_launch">Upcoming Campaign or Token Launch</option>
+              <option value="low_engagement">Active Product / Quiet Socials</option>
+              <option value="unanswered_community">Unanswered Community Questions</option>
+              <option value="recent_funding">Recent Ecosystem Funding / Grant</option>
+              <option value="general_gap">General Growth / Content Gap</option>
+            </select>
+          </div>
+          <div class="group">
+            <label for="status">Pipeline Status</label>
+            <select class="field" id="status">
+              <option>New</option>
+              <option>Researching</option>
+              <option>Qualified</option>
+              <option>Ready to contact</option>
+              <option>Contacted</option>
+              <option>Replied</option>
+              <option>Negotiating</option>
+              <option>Won</option>
+              <option>Lost</option>
+            </select>
+          </div>
+          <div class="group">
+            <label for="value">Agreed / Estimated Value ($ USD)</label>
+            <input class="field" id="value" type="number" min="0" step=".01" placeholder="0.00">
+          </div>
+          <div class="group">
+            <label for="followup">Next Follow-up Date</label>
+            <input class="field" id="followup" type="date">
+          </div>
+          <div class="group">
+            <label for="payment">Payment Status</label>
+            <select class="field" id="payment">
+              <option>Not agreed</option>
+              <option>Pending</option>
+              <option>Paid</option>
+            </select>
+          </div>
+          <div class="group full">
+            <label for="gap">Observed Gap / Evidence Notes</label>
+            <textarea class="field" id="gap" rows="2" maxlength="500" placeholder="Describe specific observable proof (e.g. Discord unanswered for 3 days, launch post without graphics)."></textarea>
+          </div>
+          <div class="group full">
+            <label for="evidenceUrl">Evidence Source Link (URL)</label>
+            <input class="field" id="evidenceUrl" type="url" placeholder="https://x.com/project/status/123...">
+          </div>
+          <div class="group full">
+            <label for="next">Next Action Steps</label>
+            <textarea class="field" id="next" rows="2" maxlength="500" placeholder="Verify founder TG, prepare customized 3-point audit, send DM."></textarea>
+          </div>
+        </div>
+        <p class="form-hint">GigRadar calculates lead priority based on signal strength, verified details, and clear outreach channels.</p>
+        <div class="modal-actions">
+          <button class="btn" type="button" id="cancel">Cancel</button>
+          <button class="btn primary" type="submit">Save Opportunity</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
 <div class="toast" id="toast" role="status"></div>
 <script src="app.js"></script>
-</body></html>
+</body>
+</html>
