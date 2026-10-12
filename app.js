@@ -261,7 +261,6 @@
   function applyTheme(theme, persist) {
     const light = theme === 'light';
     document.documentElement.setAttribute('data-theme', light ? 'light' : 'dark');
-    $('themeIcon').textContent = light ? '☾' : '☀';
     $('themeLabel').textContent = light ? 'Dark' : 'Light';
     $('themeToggle').setAttribute('aria-pressed', String(light));
     $('themeToggle').setAttribute('aria-label', light ? 'Switch to dark mode' : 'Switch to light mode');
@@ -273,7 +272,7 @@
   // ---------- wiring ----------
   document.querySelectorAll('[data-view]').forEach(b => b.onclick = () => go(b.dataset.view));
   document.querySelectorAll('[data-goto]').forEach(b => b.onclick = () => go(b.dataset.goto));
-  ['sideAdd', 'addTop', 'addList', 'quickAdd', 'addPipe'].forEach(id => $(id).onclick = () => openModal());
+  ['sideAdd', 'addTop', 'addList', 'addPipe', 'fab'].forEach(id => $(id).onclick = () => openModal());
   $('close').onclick = $('cancel').onclick = closeModal;
   $('modal').onclick = e => { if (e.target === $('modal')) closeModal(); };
   document.onkeydown = e => { if (e.key === 'Escape') closeModal(); };
@@ -302,4 +301,3 @@
   leads = loadLeads();
   render();
 })();
-  
