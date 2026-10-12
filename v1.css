@@ -1,0 +1,74 @@
+/* GigRadar V1 additions. Loaded after styles.css so it can extend or override it.
+   Dark stays the default look. Light is switched on by <html data-theme="light">. */
+
+html{color-scheme:dark}
+html[data-theme="light"]{color-scheme:light}
+
+/* ---------- new components (both themes) ---------- */
+.topbar-actions{display:flex;align-items:center;gap:8px}
+.theme-btn{padding:7px 11px;border-radius:99px;font-size:11px;font-weight:700}
+.pipeline{grid-template-columns:repeat(6,1fr)}
+.err{margin:0;font-size:11px;color:#ff9b8f;font-weight:600}
+.err .text-btn{margin-left:4px}
+.field[aria-invalid="true"]{border-color:#ff9b8f}
+.overdue{color:#ff9b8f;font-weight:700}
+.meta.links a{color:var(--lime);text-decoration:none}
+.meta.links a:hover{text-decoration:underline}
+.notice{margin-bottom:18px;padding:12px 15px;border:1px solid #ff9b8f;border-radius:12px;font-size:12px;background:#3d292733}
+.data-msg{margin:0;padding:12px 19px;font-size:11px;color:var(--muted)}
+.data-msg:empty{display:none}
+.toast.error{background:#ff9b8f;color:#2a0e0b;max-width:calc(100vw - 32px);text-align:center}
+#backupPanel .panel-head{flex-wrap:wrap}
+:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+.field:focus-visible{outline:0}
+@media(max-width:620px){
+  .pipeline{grid-template-columns:repeat(3,1fr);row-gap:12px}
+  .theme-btn #themeLabel{display:none}
+  .pill{padding:6px 9px}
+}
+@media(prefers-reduced-motion:reduce){.toast{transition:none}}
+
+/* ---------- light theme ---------- */
+html[data-theme="light"]{
+  --bg:#f4f7f1;--panel:#ffffff;--line:#d3dccf;--text:#16201a;--muted:#566657;--soft:#e3edda;--lime:#3d7a0e;
+}
+[data-theme="light"] body{background:radial-gradient(ellipse at 80% 0,#e2f0cf,transparent 35%),var(--bg)}
+[data-theme="light"] .brand-mark,
+[data-theme="light"] .primary{background:#c7f36b;color:#141911;border-color:#a6d44a}
+[data-theme="light"] .nav-label{color:#6c7b6b}
+[data-theme="light"] .operator-tip{color:#3b4a3d}
+[data-theme="light"] .btn{background:#eef3ea;color:var(--text)}
+[data-theme="light"] .primary{background:#c7f36b}
+[data-theme="light"] .stat,
+[data-theme="light"] .panel{background:#ffffff}
+[data-theme="light"] .row,
+[data-theme="light"] th,
+[data-theme="light"] td{border-bottom-color:#e2e8de}
+[data-theme="light"] .bar{background:#dde5d9}
+[data-theme="light"] .logo{background:#e3edda;color:#2f6309}
+[data-theme="light"] .badge{background:#e3f0cf;color:#2f6309}
+[data-theme="light"] .badge.contacted{background:#faedcf;color:#7a5410}
+[data-theme="light"] .badge.replied{background:#d5f0e0;color:#1c6b3c}
+[data-theme="light"] .badge.negotiating{background:#eadcf8;color:#5b2d96}
+[data-theme="light"] .badge.won{background:#dcefc6;color:#2f6309}
+[data-theme="light"] .badge.lost{background:#fadbd7;color:#a3281b}
+[data-theme="light"] .badge.new{background:#d8e8fa;color:#1d558f}
+[data-theme="light"] .icon-btn{background:#f0f4ed;color:#3b4a3d;border-color:#cdd7c9}
+[data-theme="light"] .quick{background:#f6f9f3}
+[data-theme="light"] .quick:hover{border-color:#8fb55a}
+[data-theme="light"] .operator-note{background:#eef6e3;border-color:#c9dcae;color:#3b4a3d}
+[data-theme="light"] .field{background:#ffffff}
+[data-theme="light"] .field:focus{border-color:#4d8a1a}
+[data-theme="light"] .checklist{color:#3b4a3d}
+[data-theme="light"] .modal{background:#ffffff;border-color:#c3cfbf}
+[data-theme="light"] .modal-backdrop{background:#16201a88}
+[data-theme="light"] .toast{background:#1d261b;color:#f1f7ec}
+[data-theme="light"] .toast.error{background:#a3281b;color:#fff}
+[data-theme="light"] footer{color:#74847a}
+[data-theme="light"] .err,
+[data-theme="light"] .overdue{color:#b3291b}
+[data-theme="light"] .field[aria-invalid="true"]{border-color:#b3291b}
+[data-theme="light"] .notice{background:#fbe9e6;border-color:#b3291b}
+@media(max-width:620px){
+  [data-theme="light"] .sidebar{background:#ffffffee}
+}
