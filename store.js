@@ -7,21 +7,26 @@
 
   var STATUSES = ['New', 'Contacted', 'Replied', 'Negotiating', 'Won', 'Lost'];
   var PAYMENTS = ['Not agreed', 'Pending', 'Paid'];
-  var SCHEMA = 2;
+  var SCHEMA = 3;
+  // Where a candidate came from. '' means unknown (older records).
+  var SOURCE_TYPES = ['manual', 'x-profile', 'x-post', 'github-repo', 'github-org', 'directory', 'job', 'website'];
+  var CATEGORIES = ['DeFi', 'Infrastructure', 'Gaming', 'NFT', 'Social / SocialFi', 'DAO', 'AI', 'Meme', 'Tooling', 'Exchange', 'Other'];
 
   var str = function (v, max) { return String(v == null ? '' : v).trim().slice(0, max || 500); };
   var newId = function () { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); };
 
   // Website: accepts "example.com" or "https://example.com/path". Only http(s) is allowed.
-  function normalizeUrl(input) {
+  function normalizeUrl(input, label) {
+    label = label || 'website';
+    var example = label === 'website' ? 'example.com' : 'https://example.com/page';
     var s = str(input, 300);
     if (!s) return { ok: true, value: '' };
-    if (/^(javascript|data|mailto|ftp|file|blob|vbscript):/i.test(s)) return { ok: false, error: 'Website must start with http:// or https://.' };
+    if (/^(javascript|data|mailto|ftp|file|blob|vbscript):/i.test(s)) return { ok: false, error: label.charAt(0).toUpperCase() + label.slice(1) + ' must start with http:// or https://.' };
     var withScheme = /^[a-z][a-z0-9+.-]*:\/\//i.test(s) ? s : 'https://' + s;
     var u;
-    try { u = new URL(withScheme); } catch (e) { return { ok: false, error: 'Enter a valid website, like example.com.' }; }
-    if (u.protocol !== 'https:' && u.protocol !== 'http:') return { ok: false, error: 'Website must start with http:// or https://.' };
-    if (!/^[^.\s]+(\.[^.\s]+)+$/.test(u.hostname)) return { ok: false, error: 'Enter a valid website, like example.com.' };
+    try { u = new URL(withScheme); } catch (e) { return { ok: false, error: 'Enter a valid ' + label + ', like ' + example + '.' }; }
+    if (u.protocol !== 'https:' && u.protocol !== 'http:') return { ok: false, error: label.charAt(0).toUpperCase() + label.slice(1) + ' must start with http:// or https://.' };
+    if (!/^[^.\s]+(\.[^.\s]+)+$/.test(u.hostname)) return { ok: false, error: 'Enter a valid ' + label + ', like ' + example + '.' };
     return { ok: true, value: u.href.replace(/\/$/, '') };
   }
 
@@ -37,6 +42,8 @@
 
   var hostOf = function (url) { try { return new URL(url).hostname.replace(/^www\./, '').toLowerCase(); } catch (e) { return ''; } };
   var nameKey = function (n) { return str(n, 90).toLowerCase().replace(/[^a-z0-9]+/g, ''); };
+
+  var safeUrl = function (v) { var n = normalizeUrl(v, 'link'); return n.ok ? n.value : ''; };
 
   // Coerce any stored or imported record into the current shape. Never throws.
   function normalizeLead(raw) {
@@ -57,6 +64,11 @@
       next: str(r.next, 500),
       website: normalizeUrl(r.website).ok ? normalizeUrl(r.website).value : '',
       xHandle: normalizeHandle(r.xHandle).ok ? normalizeHandle(r.xHandle).value : '',
+      category: CATEGORIES.indexOf(str(r.category, 40)) >= 0 ? str(r.category, 40) : '',
+      sourceType: SOURCE_TYPES.indexOf(r.sourceType) >= 0 ? r.sourceType : '',
+      sourceUrl: safeUrl(r.sourceUrl),
+      evidenceUrl: safeUrl(r.evidenceUrl),
+      discovered: /^\d{4}-\d{2}-\d{2}$/.test(str(r.discovered)) ? str(r.discovered) : '',
       created: isFinite(created) && created > 0 ? created : now,
       updated: isFinite(updated) && updated > 0 ? updated : now
     };
@@ -69,6 +81,7 @@
       var l = leads[i];
       if (ignoreId && l.id === ignoreId) continue;
       if (host && hostOf(l.website) === host) return { lead: l, reason: 'the same website' };
+      if (candidate.sourceUrl && /^github-/.test(candidate.sourceType || '') && l.sourceUrl === candidate.sourceUrl) return { lead: l, reason: 'the same GitHub link' };
       if (handle && (l.xHandle || '').toLowerCase() === handle) return { lead: l, reason: 'the same X profile' };
       if (key && nameKey(l.name) === key && (l.chain || '') === (candidate.chain || '')) return { lead: l, reason: 'the same name and chain' };
     }
@@ -84,8 +97,12 @@
     if (!site.ok) errors.website = site.error;
     var x = normalizeHandle(input.xHandle);
     if (!x.ok) errors.xHandle = x.error;
+    var ev = normalizeUrl(input.evidenceUrl, 'link');
+    if (!ev.ok) errors.evidenceUrl = ev.error;
+    var src = normalizeUrl(input.sourceUrl, 'link');
+    if (!src.ok) errors.sourceUrl = src.error;
     if (Object.keys(errors).length) return { ok: false, errors: errors };
-    var lead = normalizeLead(Object.assign({}, input, { name: name, website: site.value, xHandle: x.value }));
+    var lead = normalizeLead(Object.assign({}, input, { name: name, website: site.value, xHandle: x.value, evidenceUrl: ev.value, sourceUrl: src.value }));
     var dup = findDuplicate(existing, lead, ignoreId);
     if (dup) return { ok: false, errors: { name: 'Already tracked as "' + dup.lead.name + '" (' + dup.reason + ').' }, duplicate: dup.lead };
     return { ok: true, lead: lead };
@@ -136,7 +153,7 @@
     return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
   }
 
-  return { STATUSES: STATUSES, PAYMENTS: PAYMENTS, SCHEMA: SCHEMA, normalizeUrl: normalizeUrl, normalizeHandle: normalizeHandle,
+  return { STATUSES: STATUSES, PAYMENTS: PAYMENTS, SOURCE_TYPES: SOURCE_TYPES, CATEGORIES: CATEGORIES, SCHEMA: SCHEMA, normalizeUrl: normalizeUrl, normalizeHandle: normalizeHandle,
     normalizeLead: normalizeLead, findDuplicate: findDuplicate, validateLead: validateLead, parseStored: parseStored,
     buildExport: buildExport, parseImport: parseImport, mergeImport: mergeImport, todayStr: todayStr, newId: newId };
 });
