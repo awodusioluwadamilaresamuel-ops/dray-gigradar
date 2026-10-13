@@ -322,11 +322,27 @@
     save();
   };
 
-  // ---------- navigation ----------
-  const titles = { overview: 'Overview', leads: 'Project leads', outreach: 'Outreach', pipeline: 'Gig pipeline', income: 'Income' };
+    // ---------- navigation ----------
+  const titles = {
+    overview: 'Overview',
+    discovery: 'Discover projects',
+    leads: 'Project leads',
+    outreach: 'Outreach',
+    pipeline: 'Gig pipeline',
+    income: 'Income'
+  };
+
   function go(v) {
-    document.querySelectorAll('.view').forEach(x => x.classList.toggle('active', x.id === 'view-' + v));
-    document.querySelectorAll('[data-view]').forEach(x => x.classList.toggle('active', x.dataset.view === v));
+    if (!titles[v] || !$('view-' + v)) v = 'overview';
+
+    document.querySelectorAll('.view').forEach(x =>
+      x.classList.toggle('active', x.id === 'view-' + v)
+    );
+
+    document.querySelectorAll('[data-view]').forEach(x =>
+      x.classList.toggle('active', x.dataset.view === v)
+    );
+
     $('crumb').textContent = titles[v];
     window.scrollTo(0, 0);
   }
