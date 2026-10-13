@@ -119,3 +119,23 @@ html[data-theme="dark"] .ico-moon,html[data-theme="light"] .ico-sun{display:none
   .nav button span{font-size:10px;margin:0}
   .nav button.active{box-shadow:none;color:var(--lime)}
 }
+
+/* ================= Phase A: import from a link ================= */
+.heading-actions{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.link-row{display:flex;gap:8px}
+.link-row .field{flex:1;min-width:0}
+.link-row .btn{flex:none}
+.detect{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:12px 0;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--soft);font-size:12px;line-height:1.45}
+.chip{display:inline-block;padding:3px 9px;border-radius:99px;background:var(--lime);color:#141911;font-weight:800;font-size:11px}
+[data-theme="light"] .chip{color:#fff}
+.src-line{margin:0 0 6px;font-size:11px;color:var(--muted)}
+#goImport,#manualImp{display:inline-block;margin:0 0 12px;padding:0;border:0;background:none;font-size:12px;font-weight:700;color:var(--lime);cursor:pointer}
+#goImport:hover,#manualImp:hover{text-decoration:underline}
+#impForm{margin-top:6px}
+#importModal .form-grid .group.full{grid-column:1/-1}
+@media(max-width:620px){
+  .toolbar #importLeads{flex:1 1 100%}
+}
+
+/* Author display rules (like .detect{display:flex}) must not defeat the hidden attribute */
+[hidden]{display:none!important}
