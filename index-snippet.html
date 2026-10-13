@@ -1,0 +1,29 @@
+<!-- Add this nav button inside <nav class="nav">, immediately after Overview -->
+<button data-view="discovery"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-leads"/></svg><span>Discover</span></button>
+
+<!-- Add this view inside <main class="main">, immediately before the existing view-leads section -->
+<section class="view" id="view-discovery">
+  <div class="view-title"><h2>Discover projects</h2><p>Find active public repositories, then investigate whether the team needs growth support.</p></div>
+  <section class="panel">
+    <form id="discoveryForm">
+      <div class="discovery-controls">
+        <input class="field" id="discoveryQuery" placeholder="Keywords e.g. wallet, DeFi, community, analytics" aria-label="Search keywords">
+        <select class="field" id="discoveryEcosystem" aria-label="Default ecosystem">
+          <option value="solana">Solana</option><option value="base">Base</option><option value="evm">Ethereum / EVM</option><option value="ton">TON</option><option value="all">All Web3</option>
+        </select>
+        <button class="btn primary" id="discoverySearch" type="submit">Search projects</button>
+      </div>
+    </form>
+    <p class="discovery-help">Searches public GitHub repositories updated in the last 180 days. Repository activity does not mean a project is hiring or has a budget. Verify the project, team, community and any real growth gap before outreach.</p>
+    <p class="discovery-status" id="discoveryStatus" role="status">Choose an ecosystem and search to discover projects.</p>
+    <div class="discovery-results" id="discoveryResults"></div>
+    <div class="discovery-footer"><span></span><button class="btn" id="discoveryMore" type="button" hidden>Load more</button></div>
+    <div class="discovery-warning">Public GitHub search has rate limits. If a limit is reached, wait and retry. No API key is stored in this app.</div>
+  </section>
+</section>
+
+<!-- Add this stylesheet in <head> after v1.css -->
+<link rel="stylesheet" href="discovery.css">
+
+<!-- Add this script at the bottom after app.js -->
+<script src="discovery.js"></script>
