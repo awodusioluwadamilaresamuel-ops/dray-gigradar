@@ -2,6 +2,7 @@
   'use strict';
 
   const Store = window.GigStore;
+  const Sources = window.GigSources;
   const KEY = 'dray-gigradar-v1';                 // same key as V0, so existing data is kept
   const META_KEY = 'dray-gigradar-meta';          // schema version and last backup date
   const PRE_V1_KEY = 'dray-gigradar-pre-v1-copy'; // untouched copy of V0 data, made once
@@ -83,10 +84,14 @@
       ' <button class="icon-btn" data-edit="' + esc(l.id) + '">Edit</button></div></div>';
   }
 
+  const sourceLabel = l => (l && l.sourceType && Sources.TYPE_LABELS[l.sourceType]) || '';
+
   function links(l) {
     const out = [];
     if (l.website) out.push('<a href="' + esc(l.website) + '" target="_blank" rel="noopener noreferrer">' + esc(l.website.replace(/^https?:\/\/(www\.)?/, '')) + '</a>');
     if (l.xHandle) out.push('<a href="https://x.com/' + esc(l.xHandle.slice(1)) + '" target="_blank" rel="noopener noreferrer">' + esc(l.xHandle) + '</a>');
+    if (l.evidenceUrl) out.push('<a href="' + esc(l.evidenceUrl) + '" target="_blank" rel="noopener noreferrer">Evidence</a>');
+    if (l.sourceType && l.sourceType !== 'manual') out.push('<span>via ' + esc(sourceLabel(l)) + '</span>');
     return out.length ? '<div class="meta links">' + out.join(' · ') + '</div>' : '';
   }
 
@@ -129,7 +134,7 @@
 
     const q = ($('search').value || '').toLowerCase(), filter = $('filter').value;
     const filtered = sorted().filter(l => (!filter || l.status === filter) &&
-      [l.name, l.chain, l.contact, l.service, l.gap, l.website, l.xHandle].join(' ').toLowerCase().includes(q));
+      [l.name, l.chain, l.contact, l.service, l.gap, l.website, l.xHandle, l.category, sourceLabel(l), l.evidenceUrl].join(' ').toLowerCase().includes(q));
     $('leadTable').innerHTML = filtered.map(l => '<tr><td><b>' + esc(l.name) + '</b><div class="meta">' + esc(l.contact || l.service) + '</div>' + links(l) + '</td><td>' + esc(l.chain) +
       '</td><td>' + badge(l.status) + '</td><td>' + money(l.value) + '</td><td>' + esc(l.followup || 'Not set') +
       '</td><td><button class="icon-btn" data-edit="' + esc(l.id) + '">Edit</button> <button class="icon-btn" data-delete="' + esc(l.id) + '" aria-label="Delete ' + esc(l.name) + '">×</button></td></tr>').join('');
@@ -165,8 +170,8 @@
   }
 
   // ---------- form ----------
-  const FIELDS = ['name', 'chain', 'website', 'xHandle', 'contact', 'service', 'status', 'value', 'followup', 'payment', 'gap', 'next'];
-  const ERROR_FIELDS = ['name', 'website', 'xHandle'];
+  const FIELDS = ['name', 'chain', 'category', 'website', 'xHandle', 'evidenceUrl', 'contact', 'service', 'status', 'value', 'followup', 'payment', 'gap', 'next'];
+  const ERROR_FIELDS = ['name', 'website', 'xHandle', 'evidenceUrl'];
 
   function clearErrors() {
     ERROR_FIELDS.forEach(f => {
@@ -181,13 +186,20 @@
     $('editId').value = l?.id || '';
     $('modalTitle').textContent = l ? 'Update opportunity' : 'Track an opportunity';
     if (l) FIELDS.forEach(f => { if (l[f] !== undefined) $(f).value = l[f]; });
+    const parts = [];
+    if (sourceLabel(l)) parts.push('Source: ' + sourceLabel(l));
+    if (l && l.discovered) parts.push('Added ' + l.discovered);
+    $('srcLine').textContent = parts.join(' · ');
+    $('srcLine').hidden = !parts.length;
+    $('goImport').hidden = !!l;
     $('modal').classList.add('open');
     setTimeout(() => $('name').focus(), 50);
   }
   const closeModal = () => $('modal').classList.remove('open');
 
-  function showFieldError(field, message, duplicateLead) {
-    const el = $('err-' + field);
+  function showFieldError(field, message, duplicateLead, imported) {
+    const el = $(imported ? 'imp-err-' + field : 'err-' + field);
+    const input = $(imported ? 'imp-' + field : field);
     el.textContent = message;
     if (duplicateLead) {
       const b = document.createElement('button');
@@ -196,7 +208,7 @@
       el.append(' ', b);
     }
     el.hidden = false;
-    $(field).setAttribute('aria-invalid', 'true');
+    input.setAttribute('aria-invalid', 'true');
   }
 
   $('form').onsubmit = e => {
@@ -204,11 +216,12 @@
     clearErrors();
     const id = $('editId').value;
     const old = leads.find(l => l.id === id);
-    const input = {};
+    const input = Object.assign({}, old || {});
     FIELDS.forEach(f => { input[f] = $(f).value; });
     input.id = id || Store.newId();
     input.created = old?.created || Date.now();
     input.updated = Date.now();
+    if (!old) { input.sourceType = 'manual'; input.discovered = Store.todayStr(); }
 
     const result = Store.validateLead(input, leads, id || null);
     if (!result.ok) {
@@ -218,6 +231,94 @@
     }
     leads = old ? leads.map(x => x.id === id ? result.lead : x) : [result.lead, ...leads];
     closeModal();
+    save();
+  };
+
+  // ---------- import from a link ----------
+  const IMP_FIELDS = ['name', 'chain', 'category', 'website', 'xHandle', 'sourceType', 'evidenceUrl', 'gap'];
+  let impSourceUrl = '';
+
+  function clearImpErrors() {
+    ['linkErr'].concat(IMP_FIELDS.map(f => 'imp-err-' + f)).forEach(id => { $(id).hidden = true; $(id).textContent = ''; });
+    IMP_FIELDS.forEach(f => $('imp-' + f).removeAttribute('aria-invalid'));
+    $('linkInput').removeAttribute('aria-invalid');
+  }
+
+  function openImport() {
+    closeModal();
+    $('impForm').reset();
+    $('linkInput').value = '';
+    impSourceUrl = '';
+    clearImpErrors();
+    $('detect').hidden = true;
+    $('impForm').hidden = true;
+    $('manualImp').hidden = false;
+    $('importModal').classList.add('open');
+    setTimeout(() => $('linkInput').focus(), 50);
+  }
+  const closeImport = () => $('importModal').classList.remove('open');
+
+  function showImpForm() {
+    $('impForm').hidden = false;
+    $('manualImp').hidden = true;
+    setTimeout(() => $('imp-name').focus(), 50);
+  }
+
+  function checkLink() {
+    clearImpErrors();
+    $('detect').hidden = true;
+    const r = Sources.classify($('linkInput').value);
+    if (!r.ok) {
+      $('linkErr').textContent = r.error + ' You can still enter the details manually.';
+      $('linkErr').hidden = false;
+      $('linkInput').setAttribute('aria-invalid', 'true');
+      return;
+    }
+    $('impForm').reset();
+    const s = r.suggest;
+    $('imp-name').value = s.name;
+    $('imp-website').value = s.website;
+    $('imp-xHandle').value = s.xHandle;
+    $('imp-sourceType').value = s.sourceType;
+    $('imp-evidenceUrl').value = s.evidenceUrl;
+    impSourceUrl = s.sourceUrl;
+    $('detType').textContent = r.typeLabel + (r.confidence === 'guess' ? ' (best guess)' : '');
+    $('detNotes').textContent = r.notes.join(' ');
+    $('detect').hidden = false;
+    showImpForm();
+  }
+
+  $('checkLink').onclick = checkLink;
+  $('linkInput').onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); checkLink(); } };
+  $('linkInput').addEventListener('paste', () => setTimeout(checkLink, 0));
+  $('manualImp').onclick = () => { impSourceUrl = ''; $('imp-sourceType').value = 'manual'; showImpForm(); };
+  $('impClose').onclick = $('impCancel').onclick = closeImport;
+  $('importModal').onclick = e => { if (e.target === $('importModal')) closeImport(); };
+
+  $('impForm').onsubmit = e => {
+    e.preventDefault();
+    clearImpErrors();
+    const input = {};
+    IMP_FIELDS.forEach(f => { input[f] = $('imp-' + f).value; });
+    input.id = Store.newId();
+    input.status = 'New';
+    input.created = input.updated = Date.now();
+    input.discovered = Store.todayStr();
+    input.sourceUrl = impSourceUrl;
+
+    const result = Store.validateLead(input, leads, null);
+    if (!result.ok) {
+      const fields = Object.keys(result.errors);
+      fields.forEach(f => {
+        if (IMP_FIELDS.includes(f)) showFieldError(f, result.errors[f], f === 'name' ? result.duplicate : null, true);
+        else { $('linkErr').textContent = result.errors[f]; $('linkErr').hidden = false; }
+      });
+      const firstField = fields.find(f => IMP_FIELDS.includes(f));
+      if (firstField) $('imp-' + firstField).focus();
+      return;
+    }
+    leads = [result.lead, ...leads];
+    closeImport();
     save();
   };
 
@@ -273,9 +374,10 @@
   document.querySelectorAll('[data-view]').forEach(b => b.onclick = () => go(b.dataset.view));
   document.querySelectorAll('[data-goto]').forEach(b => b.onclick = () => go(b.dataset.goto));
   ['sideAdd', 'addTop', 'addList', 'addPipe', 'fab'].forEach(id => $(id).onclick = () => openModal());
+  ['importTop', 'importLeads', 'goImport'].forEach(id => $(id).onclick = openImport);
   $('close').onclick = $('cancel').onclick = closeModal;
   $('modal').onclick = e => { if (e.target === $('modal')) closeModal(); };
-  document.onkeydown = e => { if (e.key === 'Escape') closeModal(); };
+  document.onkeydown = e => { if (e.key === 'Escape') { closeModal(); closeImport(); } };
   $('search').oninput = render;
   $('filter').onchange = render;
 
@@ -283,7 +385,7 @@
     let b = e.target.closest('[data-edit]');
     if (b) {
       const l = leads.find(x => x.id === b.dataset.edit);
-      if (l) openModal(l);
+      if (l) { closeImport(); openModal(l); }
       return;
     }
     b = e.target.closest('[data-delete]');
