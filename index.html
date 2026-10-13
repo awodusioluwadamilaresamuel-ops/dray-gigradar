@@ -7,6 +7,7 @@
 <script>try{var t=localStorage.getItem('dray-gigradar-theme');document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark')}catch(e){document.documentElement.setAttribute('data-theme','dark')}</script>
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="v1.css">
+<link rel="stylesheet" href="discovery.css">
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
@@ -21,12 +22,14 @@
 <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
 <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.6 6.6 0 0 0 9.8 9.8z"/></symbol>
 </defs></svg>
+
 <div class="app">
   <aside class="sidebar">
     <div class="brand"><span class="brand-mark">G</span><div><b>GigRadar<span>.</span></b><small>DRAY'S OPPORTUNITY DESK</small></div></div>
     <div class="nav-label">WORKSPACE</div>
     <nav class="nav">
       <button class="active" data-view="overview"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-overview"/></svg><span>Overview</span></button>
+      <button data-view="discovery"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-leads"/></svg><span>Discover</span></button>
       <button data-view="leads"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-leads"/></svg><span>Leads</span></button>
       <button data-view="outreach"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-outreach"/></svg><span>Outreach</span></button>
       <button data-view="pipeline"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-pipeline"/></svg><span>Gig pipeline</span></button>
@@ -34,9 +37,11 @@
     </nav>
     <div class="operator-tip"><small>THE OPERATOR RULE</small><p>Don't just ask for a gig. Find a gap, show the fix, and make it easy to say yes.</p><button class="btn" id="sideAdd"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg>Add opportunity</button></div>
   </aside>
+
   <main class="main">
     <header class="topbar"><span>Workspace / <b id="crumb">Overview</b></span><span class="topbar-actions"><button class="icon-btn theme-btn" id="themeToggle" type="button" aria-pressed="false" aria-label="Switch to light mode"><svg class="ico ico-sun" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-sun"/></svg><svg class="ico ico-moon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-moon"/></svg><span id="themeLabel">Light</span></button><span class="pill"><i></i> Operator mode</span></span></header>
     <div class="notice" id="notice" role="alert" hidden><span id="noticeText"></span> <button class="text-btn" id="downloadRecovery" type="button">Download recovery copy</button></div>
+
     <section class="view active" id="view-overview">
       <div class="heading"><div><h1>Opportunity desk<span>.</span></h1><p>Less scrolling. Better targets. <strong>More paid work.</strong></p></div><div class="heading-actions"><button class="btn" id="importTop" type="button"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-link"/></svg>Import link</button><button class="btn primary" id="addTop"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg>Add lead</button></div></div>
       <div class="stats">
@@ -51,30 +56,56 @@
           <section class="panel"><div class="panel-head"><div><b>Recently tracked</b><p>Projects on your radar right now.</p></div><button class="text-btn" data-goto="leads">All leads</button></div><div id="recent" class="rows"></div></section>
         </div>
         <div>
-          <section class="panel"><div class="panel-head"><div><b>Your next move</b><p>Based on your current leads.</p></div></div>
-            <div class="operator-note"><small>OPERATOR'S NOTE</small><p id="noteText">Your first goal isn't 100 leads. It's 5 well-researched projects and 5 thoughtful approaches.</p></div>
-          </section>
+          <section class="panel"><div class="panel-head"><div><b>Your next move</b><p>Based on your current leads.</p></div></div><div class="operator-note"><small>OPERATOR'S NOTE</small><p id="noteText">Your first goal isn't 100 leads. It's 5 well-researched projects and 5 thoughtful approaches.</p></div></section>
           <section class="panel"><div class="panel-head"><div><b>Follow-up discipline</b><p>Open opportunities needing a next step.</p></div></div><div id="followups" class="rows"></div></section>
         </div>
       </div>
       <section class="panel" id="backupPanel"><div class="panel-head"><div><b>Backup</b><p id="backupInfo">Records live only in this browser. Export a copy regularly.</p></div><div class="right"><button class="btn" id="exportBtn" type="button">Export backup</button><button class="btn" id="importBtn" type="button">Import backup</button></div></div><p class="data-msg" id="dataMsg" role="status"></p><input type="file" id="importFile" accept="application/json,.json" hidden></section>
       <footer>GigRadar V1 · Records are stored in this browser on this device.</footer>
     </section>
+
+    <section class="view" id="view-discovery">
+      <div class="view-title"><h2>Discover projects</h2><p>Find active public repositories, then investigate whether the team needs growth support.</p></div>
+      <section class="panel">
+        <form id="discoveryForm">
+          <div class="discovery-controls">
+            <input class="field" id="discoveryQuery" placeholder="Keywords e.g. wallet, DeFi, community, analytics" aria-label="Search keywords">
+            <select class="field" id="discoveryEcosystem" aria-label="Default ecosystem">
+              <option value="solana">Solana</option>
+              <option value="base">Base</option>
+              <option value="evm">Ethereum / EVM</option>
+              <option value="ton">TON</option>
+              <option value="all">All Web3</option>
+            </select>
+            <button class="btn primary" id="discoverySearch" type="submit">Search projects</button>
+          </div>
+        </form>
+        <p class="discovery-help">Searches public GitHub repositories updated in the last 180 days. Repository activity does not mean a project is hiring or has a budget. Verify the project, team, community and any real growth gap before outreach.</p>
+        <p class="discovery-status" id="discoveryStatus" role="status">Choose an ecosystem and search to discover projects.</p>
+        <div class="discovery-results" id="discoveryResults"></div>
+        <div class="discovery-footer"><span></span><button class="btn" id="discoveryMore" type="button" hidden>Load more</button></div>
+        <div class="discovery-warning">Public GitHub search has rate limits. If a limit is reached, wait and retry. No API key is stored in this app.</div>
+      </section>
+    </section>
+
     <section class="view" id="view-leads">
       <div class="view-title"><h2>Project leads</h2><p>Track projects, spot gaps, and pitch with purpose.</p></div>
       <section class="panel"><div class="toolbar"><input class="field" id="search" placeholder="Search project, chain, contact…"><select class="field" id="filter"><option value="">All statuses</option><option>New</option><option>Contacted</option><option>Replied</option><option>Negotiating</option><option>Won</option><option>Lost</option></select><button class="btn" id="importLeads" type="button"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-link"/></svg>Import link</button><button class="btn primary" id="addList"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg>Add lead</button></div>
       <div class="table-wrap"><table><thead><tr><th>PROJECT / CONTACT</th><th>CHAIN</th><th>STATUS</th><th>VALUE</th><th>FOLLOW-UP</th><th>ACTIONS</th></tr></thead><tbody id="leadTable"></tbody></table></div><div class="empty" id="leadEmpty" hidden><b>No leads match that search.</b>Try another keyword or add a project.</div></section>
     </section>
+
     <section class="view" id="view-outreach">
       <div class="view-title"><h2>Outreach tracker</h2><p>Every pitch needs context, a reason, and a next step. No copy-paste spam.</p></div>
       <section class="panel"><div class="panel-head"><div><b>Conversation board</b><p>Update status from your project leads.</p></div><button class="btn" data-goto="leads">Find leads</button></div><div id="outreachRows" class="rows"></div></section>
       <section class="panel"><div class="panel-head"><div><b>Before you hit send</b><p>Quick quality check</p></div></div><div class="checklist"><label><input type="checkbox"> I identified a specific gap or opportunity.</label><label><input type="checkbox"> I can explain how my work would help.</label><label><input type="checkbox"> My message is short, personal, and easy to answer.</label><label><input type="checkbox"> I recorded when and how I'll follow up.</label></div></section>
     </section>
+
     <section class="view" id="view-pipeline">
       <div class="view-title"><h2>Gig pipeline</h2><p>Move from promising project to scope, agreed payment, and delivery.</p></div>
       <div class="stats pipeline-stats" id="pStats"></div>
       <section class="panel"><div class="panel-head"><div><b>All opportunities</b><p>Update stage as the conversation progresses.</p></div><button class="btn" id="addPipe"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg>Add lead</button></div><div id="pipeRows" class="rows"></div></section>
     </section>
+
     <section class="view" id="view-income">
       <div class="view-title"><h2>Income tracker</h2><p>Track what you've earned, what's pending, and work in progress.</p></div>
       <div class="money-grid"><article class="money-card"><small>Total earned</small><strong id="iEarned">$0</strong><small>Completed and paid gigs</small></article><article class="money-card"><small>Payments pending</small><strong id="iPending">$0</strong><small>Won gigs not marked paid</small></article><article class="money-card"><small>Open pipeline</small><strong id="iPipeline">$0</strong><small>Estimated active lead value</small></article></div>
@@ -82,6 +113,7 @@
     </section>
   </main>
 </div>
+
 <div class="modal-backdrop" id="modal"><div class="modal"><div class="modal-head"><b id="modalTitle">Track an opportunity</b><button class="icon-btn" id="close" type="button" aria-label="Close"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-close"/></svg></button></div>
 <form id="form" novalidate><div class="modal-body"><input type="hidden" id="editId"><p class="src-line" id="srcLine" hidden></p><button class="text-btn" id="goImport" type="button">Have a link? Import it instead</button><div class="form-grid">
   <div class="group"><label for="name">Project name *</label><input class="field" id="name" maxlength="90" placeholder="Solana protocol" aria-describedby="err-name"><p class="err" id="err-name" role="alert" hidden></p></div>
@@ -99,6 +131,7 @@
   <div class="group full"><label for="gap">Observed gap / why approach them?</label><textarea class="field" id="gap" rows="2" maxlength="500" placeholder="What could be improved? What did you actually notice?"></textarea></div>
   <div class="group full"><label for="next">Next action / notes</label><textarea class="field" id="next" rows="2" maxlength="500" placeholder="Review onboarding, then send one specific suggestion."></textarea></div>
 </div><p class="form-hint">Record real observations. An estimate is not an agreed fee.</p><div class="modal-actions"><button class="btn" type="button" id="cancel">Cancel</button><button class="btn primary" type="submit">Save opportunity</button></div></div></form></div></div>
+
 <div class="modal-backdrop" id="importModal"><div class="modal"><div class="modal-head"><b>Import from a link</b><button class="icon-btn" id="impClose" type="button" aria-label="Close"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-close"/></svg></button></div>
 <div class="modal-body">
 <div class="group"><label for="linkInput">Project link</label><div class="link-row"><input class="field" id="linkInput" inputmode="url" autocapitalize="off" autocomplete="off" placeholder="x.com/project or github.com/org/repo" aria-describedby="linkErr"><button class="btn" id="checkLink" type="button">Check link</button></div><p class="err" id="linkErr" role="alert" hidden></p></div>
@@ -109,9 +142,11 @@
 <div class="group"><label for="imp-name">Project name *</label><input class="field" id="imp-name" maxlength="90" autocomplete="off"><p class="err" id="imp-err-name" role="alert" hidden></p></div><div class="group"><label for="imp-chain">Chain / ecosystem</label><select class="field" id="imp-chain"><option>Solana</option><option>Ethereum / EVM</option><option>Base</option><option>TON</option><option selected>Other</option></select><p class="err" id="imp-err-chain" role="alert" hidden></p></div><div class="group"><label for="imp-category">Category</label><select class="field" id="imp-category"><option value="">Not set</option><option>DeFi</option><option>Infrastructure</option><option>Gaming</option><option>NFT</option><option>Social / SocialFi</option><option>DAO</option><option>AI</option><option>Meme</option><option>Tooling</option><option>Exchange</option><option>Other</option></select><p class="err" id="imp-err-category" role="alert" hidden></p></div><div class="group"><label for="imp-website">Website</label><input class="field" id="imp-website" maxlength="300" inputmode="url" autocapitalize="off" placeholder="example.com"><p class="err" id="imp-err-website" role="alert" hidden></p></div><div class="group"><label for="imp-xHandle">Project X profile</label><input class="field" id="imp-xHandle" maxlength="200" autocapitalize="off" placeholder="@project"><p class="err" id="imp-err-xHandle" role="alert" hidden></p></div><div class="group"><label for="imp-sourceType">Where did you find it?</label><select class="field" id="imp-sourceType"><option value="">Not sure</option><option value="x-profile">X profile</option><option value="x-post">X post</option><option value="github-repo">GitHub repository</option><option value="github-org">GitHub profile or organization</option><option value="directory">Project directory</option><option value="job">Job or bounty listing</option><option value="website">Project website</option><option value="manual">Entered manually</option></select><p class="err" id="imp-err-sourceType" role="alert" hidden></p></div><div class="group full"><label for="imp-evidenceUrl">Evidence or opportunity link</label><input class="field" id="imp-evidenceUrl" maxlength="300" inputmode="url" autocapitalize="off" placeholder="Link to the post, listing or page showing the need"><p class="err" id="imp-err-evidenceUrl" role="alert" hidden></p></div><div class="group full"><label for="imp-gap">Why is it worth investigating?</label><textarea class="field" id="imp-gap" rows="2" maxlength="500" placeholder="What did you actually notice?"></textarea><p class="err" id="imp-err-gap" role="alert" hidden></p></div>
 </div><p class="form-hint">Only the name is required. You can fill in the rest later.</p><div class="modal-actions"><button class="btn" type="button" id="impCancel">Cancel</button><button class="btn primary" type="submit">Save candidate</button></div></form>
 </div></div></div>
+
 <button class="fab" id="fab" type="button" aria-label="Add lead"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg></button>
 <div class="toast" id="toast" role="status"></div>
 <script src="store.js"></script>
 <script src="sources.js"></script>
 <script src="app.js"></script>
+<script src="discovery.js"></script>
 </body></html>
