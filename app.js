@@ -16,6 +16,47 @@
   const initials = s => String(s || '?').trim().split(/\s+/).slice(0, 2).map(x => x[0] || '').join('').toUpperCase();
   const active = l => ['Contacted', 'Replied', 'Negotiating'].includes(l.status);
 const open = l => !['Won', 'Lost'].includes(l.status);
+  // Opportunity Intelligence: research readiness.
+// This measures information completeness, not hiring intent or budget.
+function researchScore(lead) {
+  const signals = [
+    ['name', 10],
+    ['website', 15],
+    ['xHandle', 15],
+    ['evidenceUrl', 20],
+    ['contact', 20],
+    ['gap', 20]
+  ];
+
+  return signals.reduce((total, signal) => {
+    return total + (
+      String(lead[signal[0]] || '').trim()
+        ? signal[1]
+        : 0
+    );
+  }, 0);
+}
+
+function researchTier(score) {
+  if (score < 40) return 'needs-research';
+  if (score < 70) return 'in-progress';
+  return 'ready-review';
+}
+
+function researchLabel(score) {
+  if (score < 40) return 'Needs research';
+  if (score < 70) return 'In progress';
+  return 'Ready for review';
+}
+
+function researchBadge(lead) {
+  const score = researchScore(lead);
+  const tier = researchTier(score);
+
+  return '<span class="research-score ' + tier + '">' +
+    score + '/100</span><div class="meta">' +
+    researchLabel(score) + '</div>';
+}
   const open = l => !['Won', 'Lost'].includes(l.status);
   const badge = s => '<span class="badge ' + String(s).toLowerCase() + '">' + esc(s) + '</span>';
   const blank = (a, b) => '<div class="empty"><b>' + a + '</b>' + b + '</div>';
