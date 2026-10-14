@@ -15,6 +15,7 @@
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const initials = s => String(s || '?').trim().split(/\s+/).slice(0, 2).map(x => x[0] || '').join('').toUpperCase();
   const active = l => ['Contacted', 'Replied', 'Negotiating'].includes(l.status);
+const open = l => !['Won', 'Lost'].includes(l.status);
   const open = l => !['Won', 'Lost'].includes(l.status);
   const badge = s => '<span class="badge ' + String(s).toLowerCase() + '">' + esc(s) + '</span>';
   const blank = (a, b) => '<div class="empty"><b>' + a + '</b>' + b + '</div>';
