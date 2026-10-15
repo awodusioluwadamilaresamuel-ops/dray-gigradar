@@ -479,8 +479,9 @@ function researchBadge(lead) {
   $('modal').onclick = e => { if (e.target === $('modal')) closeModal(); };
   document.onkeydown = e => { if (e.key === 'Escape') { closeModal(); closeImport(); } };
   $('search').oninput = render;
-  $('filter').onchange = render;
-
+$('filter').onchange = render;
+$('researchFilter').onchange = render;
+$('researchSort').onchange = render;
   document.addEventListener('click', e => {
     let b = e.target.closest('[data-edit]');
     if (b) {
