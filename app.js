@@ -56,8 +56,7 @@ function researchBadge(lead) {
   return '<span class="research-score ' + tier + '">' +
     score + '/100</span><div class="meta">' +
     researchLabel(score) + '</div>';
-}
-  const open = l => !['Won', 'Lost'].includes(l.status);
+} 
   const badge = s => '<span class="badge ' + String(s).toLowerCase() + '">' + esc(s) + '</span>';
   const blank = (a, b) => '<div class="empty"><b>' + a + '</b>' + b + '</div>';
 
