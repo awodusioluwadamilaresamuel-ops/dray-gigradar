@@ -173,12 +173,55 @@ function researchBadge(lead) {
       : due.length ? 'You have follow-ups scheduled. Keep them tied to a real next step.'
       : 'You have ' + act + ' active conversation(s). Give each one a clear next action.';
 
-    const q = ($('search').value || '').toLowerCase(), filter = $('filter').value;
-    const filtered = sorted().filter(l => (!filter || l.status === filter) &&
-      [l.name, l.chain, l.contact, l.service, l.gap, l.website, l.xHandle, l.category, sourceLabel(l), l.evidenceUrl].join(' ').toLowerCase().includes(q));
-    $('leadTable').innerHTML = filtered.map(l => '<tr><td><b>' + esc(l.name) + '</b><div class="meta">' + esc(l.contact || l.service) + '</div>' + links(l) + '</td><td>' + esc(l.chain) +
-      '</td><td>' + badge(l.status) + '</td><td>' + money(l.value) + '</td><td>' + esc(l.followup || 'Not set') +
-      '</td><td><button class="icon-btn" data-edit="' + esc(l.id) + '">Edit</button> <button class="icon-btn" data-delete="' + esc(l.id) + '" aria-label="Delete ' + esc(l.name) + '">×</button></td></tr>').join('');
+        const q = ($('search').value || '').toLowerCase();
+    const filter = $('filter').value;
+    const readinessFilter = $('researchFilter').value;
+    const researchSort = $('researchSort').value;
+
+    const filtered = sorted().filter(l => {
+      const tier = researchTier(researchScore(l));
+
+      return (!filter || l.status === filter) &&
+        (!readinessFilter || tier === readinessFilter) &&
+        [
+          l.name,
+          l.chain,
+          l.contact,
+          l.service,
+          l.gap,
+          l.website,
+          l.xHandle,
+          l.category,
+          sourceLabel(l),
+          l.evidenceUrl
+        ].join(' ').toLowerCase().includes(q);
+    });
+
+    if (researchSort === 'score') {
+      filtered.sort((a, b) =>
+        researchScore(b) - researchScore(a) ||
+        b.updated - a.updated
+      );
+    }
+
+    $('leadTable').innerHTML = filtered.map(l =>
+      '<tr>' +
+        '<td><b>' + esc(l.name) + '</b>' +
+          '<div class="meta">' + esc(l.contact || l.service) + '</div>' +
+          links(l) +
+        '</td>' +
+        '<td>' + researchBadge(l) + '</td>' +
+        '<td>' + esc(l.chain) + '</td>' +
+        '<td>' + badge(l.status) + '</td>' +
+        '<td>' + money(l.value) + '</td>' +
+        '<td>' + esc(l.followup || 'Not set') + '</td>' +
+        '<td><button class="icon-btn" data-edit="' + esc(l.id) +
+          '">Edit</button> <button class="icon-btn" data-delete="' +
+          esc(l.id) + '" aria-label="Delete ' + esc(l.name) +
+          '">×</button></td>' +
+      '</tr>'
+    ).join('');
+
     $('leadEmpty').hidden = !!filtered.length;
 
     const conversations = sorted().filter(l => !['New', 'Lost'].includes(l.status));
