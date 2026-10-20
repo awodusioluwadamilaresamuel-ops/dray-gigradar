@@ -87,17 +87,6 @@
         <div class="discovery-warning">Public GitHub search has rate limits. If a limit is reached, wait and retry. No API key is stored in this app.</div>
       </section>
     </section>
-
-    <section class="view" id="view-leads">
-      <div class="view-title"><h2>Project leads</h2><p>Track projects, spot gaps, and pitch with purpose.</p></div>
-      <section class="panel"><div class="toolbar"><input class="field" id="search" placeholder="Search project, chain, contact…"><select class="field" id="filter"><option value="">All statuses</option><option>New</option><option>Contacted</option><option>Replied</option><option>Negotiating</option><option>Won</option><option>Lost</option></select><button class="btn" id="importLeads" type="button"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-link"/></svg>Import link</button><button class="btn primary" id="addList"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg>Add lead</button></div>
-      <p class="research-note">
-  Research readiness measures how much information you've collected.
-  It does not mean a project is hiring or has a budget.
-      </p>
-        <div class="table-wrap"><table><thead><tr><th>PROJECT / CONTACT</th><th>CHAIN</th><th>STATUS</th><th>VALUE</th><th>FOLLOW-UP</th><th>ACTIONS</th></tr></thead><tbody id="leadTable"></tbody></table></div><div class="empty" id="leadEmpty" hidden><b>No leads match that search.</b>Try another keyword or add a project.</div></section>
-    </section>
-
     <section class="view" id="view-outreach">
       <div class="view-title"><h2>Outreach tracker</h2><p>Every pitch needs context, a reason, and a next step. No copy-paste spam.</p></div>
       <section class="panel"><div class="panel-head"><div><b>Conversation board</b><p>Update status from your project leads.</p></div><button class="btn" data-goto="leads">Find leads</button></div><div id="outreachRows" class="rows"></div></section>
