@@ -175,8 +175,9 @@ function researchBadge(lead) {
 
         const q = ($('search').value || '').toLowerCase();
     const filter = $('filter').value;
-    const readinessFilter = $('researchFilter').value;
-    const researchSort = $('researchSort').value;
+    // Safe defaults until the controls are added to index.html.
+const readinessFilter = $('researchFilter')?.value || '';
+const researchSort = $('researchSort')?.value || 'recent';
 
     const filtered = sorted().filter(l => {
       const tier = researchTier(researchScore(l));
@@ -480,8 +481,14 @@ function researchBadge(lead) {
   document.onkeydown = e => { if (e.key === 'Escape') { closeModal(); closeImport(); } };
   $('search').oninput = render;
 $('filter').onchange = render;
-$('researchFilter').onchange = render;
-$('researchSort').onchange = render;
+
+if ($('researchFilter')) {
+  $('researchFilter').onchange = render;
+}
+
+if ($('researchSort')) {
+  $('researchSort').onchange = render;
+}
   document.addEventListener('click', e => {
     let b = e.target.closest('[data-edit]');
     if (b) {
