@@ -15,3 +15,18 @@
 .discovery-footer a{font-size:12px;color:var(--muted)}
 .discovery-warning{border-left:3px solid var(--accent,#7cb88a);padding:10px 12px;background:var(--panel,rgba(128,128,128,.08));font-size:12px;line-height:1.5;color:var(--muted);margin-top:12px}
 @media(max-width:760px){.discovery-controls{grid-template-columns:1fr}.discovery-results{grid-template-columns:1fr}.discovery-footer{align-items:flex-start;flex-direction:column}}
+.discovery-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  color: var(--muted);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.discovery-filter input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+}
