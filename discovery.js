@@ -16,7 +16,7 @@ const results = $('discoveryResults');
 const status = $('discoveryStatus');
 const searchBtn = $('discoverySearch');
 const moreBtn = $('discoveryMore');
-
+const hideTracked = $('hideTrackedProjects');
 let page = 1;
 let lastQuery = '';
 let busy = false;
@@ -247,11 +247,12 @@ try {
 
   if (items.length > 0) {
     results.insertAdjacentHTML(
-      'beforeend',
-      items.map(renderRepository).join('')
-    );
+  'beforeend',
+  items.map(renderRepository).join('')
+);
 
-    page += 1;
+refreshTrackedStatus();
+page += 1;
   }
 
   const displayed =
@@ -287,25 +288,32 @@ try {
 }
 
 }
-
 function refreshTrackedStatus() {
   results.querySelectorAll('.discovery-card').forEach(card => {
     const button = card.querySelector('[data-discovery-import]');
     if (!button) return;
 
-    const tracked = isTracked(button.getAttribute('data-discovery-import'));
+    const tracked = isTracked(
+      button.getAttribute('data-discovery-import')
+    );
 
     button.disabled = tracked;
     button.textContent = tracked
       ? 'Already tracked ✓'
       : 'Track this project';
+
+    card.hidden = Boolean(
+      hideTracked && hideTracked.checked && tracked
+    );
   });
 }
-
 window.addEventListener(
   'gigradar:leads-updated',
   refreshTrackedStatus
 );
+  if (hideTracked) {
+  hideTracked.addEventListener('change', refreshTrackedStatus);
+  }
 // Search using the current keywords and ecosystem.
 form.addEventListener('submit', event => {
 event.preventDefault();
