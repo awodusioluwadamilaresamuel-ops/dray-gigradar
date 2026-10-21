@@ -25,6 +25,43 @@ const MAX_RESULTS = 100;
 const PAGE_SIZE = 20;
 const SEARCH_DAYS = 180;
 
+const LEADS_KEY = 'dray-gigradar-v1';
+
+function normalizeRepoUrl(value) {
+  try {
+    const url = new URL(value);
+    if (url.hostname.toLowerCase() !== 'github.com') return '';
+
+    const path = url.pathname
+      .replace(/\/+$/, '')
+      .replace(/\.git$/i, '')
+      .toLowerCase();
+
+    return 'https://github.com' + path;
+  } catch {
+    return '';
+  }
+}
+
+function isTracked(repoUrl) {
+  try {
+    const saved = JSON.parse(
+      localStorage.getItem(LEADS_KEY) || '[]'
+    );
+
+    if (!Array.isArray(saved)) return false;
+
+    const target = normalizeRepoUrl(repoUrl);
+
+    return saved.some(lead =>
+      lead &&
+      [lead.sourceUrl, lead.website, lead.evidenceUrl]
+        .some(link => normalizeRepoUrl(link) === target && target)
+    );
+  } catch {
+    return false;
+  }
+}
 const ecosystemTerms = {
 solana: 'solana',
 base: 'base blockchain',
@@ -87,7 +124,7 @@ const description = repo.description
 
 const language = repo.language || 'Not specified';
 const stars = Number(repo.stargazers_count || 0).toLocaleString();
-
+const tracked = isTracked(repo.html_url || '');
 const repoURL = escapeHTML(repo.html_url || '#');
 const ownerURL = escapeHTML(
   repo.owner && repo.owner.html_url
@@ -96,7 +133,8 @@ const ownerURL = escapeHTML(
 );
 
 return `
-  <article class="discovery-card">
+  <article class="discovery-card"
+  data-repo-url="${repoURL}">
     <h3>
       <a href="${repoURL}" target="_blank" rel="noopener noreferrer">
         ${escapeHTML(repo.full_name || 'Unnamed repository')}
@@ -116,12 +154,12 @@ return `
 
     <div class="discovery-footer">
       <button
-        class="btn primary"
-        type="button"
-        data-discovery-import="${repoURL}">
-        Track this project
-      </button>
-
+  class="btn primary"
+  type="button"
+  data-discovery-import="${repoURL}"
+  ${tracked ? 'disabled' : ''}>
+  ${tracked ? 'Already tracked ✓' : 'Track this project'}
+</button>
       <a href="${ownerURL}" target="_blank" rel="noopener noreferrer">
         View owner ↗
       </a>
@@ -250,6 +288,24 @@ try {
 
 }
 
+function refreshTrackedStatus() {
+  results.querySelectorAll('.discovery-card').forEach(card => {
+    const button = card.querySelector('[data-discovery-import]');
+    if (!button) return;
+
+    const tracked = isTracked(button.getAttribute('data-discovery-import'));
+
+    button.disabled = tracked;
+    button.textContent = tracked
+      ? 'Already tracked ✓'
+      : 'Track this project';
+  });
+}
+
+window.addEventListener(
+  'gigradar:leads-updated',
+  refreshTrackedStatus
+);
 // Search using the current keywords and ecosystem.
 form.addEventListener('submit', event => {
 event.preventDefault();
