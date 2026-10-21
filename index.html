@@ -79,7 +79,11 @@
             </select>
             <button class="btn primary" id="discoverySearch" type="submit">Search projects</button>
           </div>
-        </form>
+        </form>  
+<label class="discovery-filter">
+  <input type="checkbox" id="hideTrackedProjects">
+  Hide already tracked projects
+</label>
         <p class="discovery-help">Searches public GitHub repositories updated in the last 180 days. Repository activity does not mean a project is hiring or has a budget. Verify the project, team, community and any real growth gap before outreach.</p>
         <p class="discovery-status" id="discoveryStatus" role="status">Choose an ecosystem and search to discover projects.</p>
         <div class="discovery-results" id="discoveryResults"></div>
