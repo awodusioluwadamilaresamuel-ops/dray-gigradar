@@ -107,15 +107,28 @@ function researchBadge(lead) {
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => t.classList.remove('show'), isError ? 4000 : 2000);
   }
-
   function save() {
     const ok = writeStorage(KEY, JSON.stringify(leads));
+
+    if (ok) {
+      window.dispatchEvent(
+        new CustomEvent('gigradar:leads-updated')
+      );
+    }
+
     render();
-    if (ok) toast('Saved on this device');
-    else toast('Could not save. Check browser storage settings, then export a backup.', true);
+
+    if (ok) {
+      toast('Saved on this device');
+    } else {
+      toast(
+        'Could not save. Check browser storage settings, then export a backup.',
+        true
+      );
+    }
+
     return ok;
   }
-
   const sorted = () => [...leads].sort((a, b) => b.updated - a.updated);
 
   // ---------- rendering ----------
