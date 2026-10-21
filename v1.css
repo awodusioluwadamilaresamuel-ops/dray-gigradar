@@ -139,3 +139,56 @@ html[data-theme="dark"] .ico-moon,html[data-theme="light"] .ico-sun{display:none
 
 /* Author display rules (like .detect{display:flex}) must not defeat the hidden attribute */
 [hidden]{display:none!important}
+
+/* ---------- Personal workspace appearance editor ---------- */
+.appearance-controls {
+  padding: 18px;
+  display: grid;
+  gap: 20px;
+}
+
+.appearance-control {
+  display: grid;
+  gap: 9px;
+}
+
+.appearance-control > label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.color-control,
+.size-control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.color-control span,
+.size-control span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+#backgroundColor {
+  width: 54px;
+  height: 42px;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--panel);
+  cursor: pointer;
+}
+
+#fontSize {
+  width: min(100%, 260px);
+  accent-color: var(--lime);
+}
+
+.appearance-actions {
+  display: flex;
+  justify-content: flex-start;
+      }
+   
