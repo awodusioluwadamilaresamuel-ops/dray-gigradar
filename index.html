@@ -92,18 +92,81 @@
       <section class="panel"><div class="panel-head"><div><b>Conversation board</b><p>Update status from your project leads.</p></div><button class="btn" data-goto="leads">Find leads</button></div><div id="outreachRows" class="rows"></div></section>
       <section class="panel"><div class="panel-head"><div><b>Before you hit send</b><p>Quick quality check</p></div></div><div class="checklist"><label><input type="checkbox"> I identified a specific gap or opportunity.</label><label><input type="checkbox"> I can explain how my work would help.</label><label><input type="checkbox"> My message is short, personal, and easy to answer.</label><label><input type="checkbox"> I recorded when and how I'll follow up.</label></div></section>
     </section>
-    <select class="field" id="researchFilter" aria-label="Filter by research readiness">
-  <option value="">All research scores</option>
-  <option value="needs-research">Needs research</option>
-  <option value="in-progress">In progress</option>
-  <option value="ready-review">Ready for review</option>
-</select>
+    
+    <section class="view" id="view-leads">
+      <div class="view-title">
+        <h2>Project leads</h2>
+        <p>Track projects, spot gaps, and pitch with purpose.</p>
+      </div>
 
-<select class="field" id="researchSort" aria-label="Sort leads">
-  <option value="recent">Recently updated</option>
-  <option value="score">Highest research score</option>
-</select>
-    <section class="view" id="view-pipeline">
+      <section class="panel">
+        <div class="toolbar">
+          <input class="field" id="search"
+            placeholder="Search project, chain, contact…"
+            aria-label="Search leads">
+
+          <select class="field" id="filter" aria-label="Filter by status">
+            <option value="">All statuses</option>
+            <option>New</option>
+            <option>Contacted</option>
+            <option>Replied</option>
+            <option>Negotiating</option>
+            <option>Won</option>
+            <option>Lost</option>
+          </select>
+
+          <select class="field" id="researchFilter"
+            aria-label="Filter by research readiness">
+            <option value="">All research scores</option>
+            <option value="needs-research">Needs research</option>
+            <option value="in-progress">In progress</option>
+            <option value="ready-review">Ready for review</option>
+          </select>
+
+          <select class="field" id="researchSort"
+            aria-label="Sort leads">
+            <option value="recent">Recently updated</option>
+            <option value="score">Highest research score</option>
+          </select>
+
+          <button class="btn" id="importLeads" type="button">
+            Import link
+          </button>
+
+          <button class="btn primary" id="addList" type="button">
+            Add lead
+          </button>
+        </div>
+
+        <p class="research-note">
+          Research readiness measures how much information you have
+          collected. It does not mean a project is hiring or has a budget.
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>PROJECT / CONTACT</th>
+                <th>RESEARCH</th>
+                <th>CHAIN</th>
+                <th>STATUS</th>
+                <th>VALUE</th>
+                <th>FOLLOW-UP</th>
+                <th>ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody id="leadTable"></tbody>
+          </table>
+        </div>
+
+        <div class="empty" id="leadEmpty" hidden>
+          <b>No leads match that search.</b>
+          Try another keyword or add a project.
+        </div>
+      </section>
+    </section>
+   <section class="view" id="view-pipeline">
       <div class="view-title"><h2>Gig pipeline</h2><p>Move from promising project to scope, agreed payment, and delivery.</p></div>
       <div class="stats pipeline-stats" id="pStats"></div>
       <section class="panel"><div class="panel-head"><div><b>All opportunities</b><p>Update stage as the conversation progresses.</p></div><button class="btn" id="addPipe"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg>Add lead</button></div><div id="pipeRows" class="rows"></div></section>
