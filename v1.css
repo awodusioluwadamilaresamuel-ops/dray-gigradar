@@ -140,55 +140,95 @@ html[data-theme="dark"] .ico-moon,html[data-theme="light"] .ico-sun{display:none
 /* Author display rules (like .detect{display:flex}) must not defeat the hidden attribute */
 [hidden]{display:none!important}
 
-/* ---------- Personal workspace appearance editor ---------- */
-.appearance-controls {
+/* ---------- Appearance settings menu ---------- */
+.appearance-trigger {
+  min-width: 42px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  font-size: 14px;
+}
+
+.appearance-menu {
+  position: fixed;
+  top: 72px;
+  right: 20px;
+  z-index: 1000;
+  width: 280px;
+  max-width: calc(100vw - 24px);
+  box-sizing: border-box;
   padding: 18px;
   display: grid;
   gap: 20px;
-}
-
-.appearance-control {
-  display: grid;
-  gap: 9px;
-}
-
-.appearance-control > label {
-  font-size: 13px;
-  font-weight: 700;
   color: var(--text);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.28);
 }
 
-.color-control,
-.size-control {
+.appearance-menu[hidden] {
+  display: none !important;
+}
+
+.appearance-menu-head {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  justify-content: space-between;
   gap: 12px;
-  flex-wrap: wrap;
 }
 
-.color-control span,
-.size-control span {
+.appearance-menu-head b {
+  font-size: 16px;
+}
+
+.appearance-menu-head p {
+  margin: 4px 0 0;
   color: var(--muted);
   font-size: 12px;
 }
 
-#backgroundColor {
-  width: 54px;
-  height: 42px;
-  padding: 3px;
-  border: 1px solid var(--line);
-  border-radius: 9px;
-  background: var(--panel);
-  cursor: pointer;
+.appearance-control {
+  display: grid;
+  gap: 10px;
+}
+
+.appearance-control label {
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.size-control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 #fontSize {
-  width: min(100%, 260px);
+  flex: 1;
+  min-width: 0;
   accent-color: var(--lime);
 }
 
-.appearance-actions {
-  display: flex;
-  justify-content: flex-start;
-      }
-   
+#fontSizeLabel {
+  min-width: 42px;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: right;
+}
+
+.appearance-menu .field {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.appearance-menu .btn {
+  width: 100%;
+}
+
+@media (max-width: 480px) {
+  .appearance-menu {
+    top: 64px;
+    right: 12px;
+  }
+}
