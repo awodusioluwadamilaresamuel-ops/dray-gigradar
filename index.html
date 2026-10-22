@@ -39,7 +39,48 @@
   </aside>
 
   <main class="main">
+    <div class="appearance-menu" id="appearancePanel" hidden>
+  <div class="appearance-menu-head">
+    <div>
+      <b>Appearance</b>
+      <p>Personalize your reading experience.</p>
+    </div>
+    <button class="icon-btn" id="closeAppearance"
+      type="button" aria-label="Close appearance settings">×</button>
+  </div>
+
+  <div class="appearance-control">
+    <label for="fontSize">Font size</label>
+    <div class="size-control">
+      <input type="range" id="fontSize"
+        min="90" max="120" step="5" value="100">
+      <span id="fontSizeLabel">100%</span>
+    </div>
+  </div>
+
+  <div class="appearance-control">
+    <label for="fontStyle">Font style</label>
+    <select class="field" id="fontStyle">
+      <option value="system">System default</option>
+      <option value="arial">Arial</option>
+      <option value="georgia">Georgia</option>
+      <option value="mono">Monospace</option>
+      <option value="trebuchet">Trebuchet</option>
+    </select>
+  </div>
+
+  <button class="btn" id="resetAppearance" type="button">
+    Reset typography
+  </button>
+    </div>
     <header class="topbar"><span>Workspace / <b id="crumb">Overview</b></span><span class="topbar-actions"><button class="icon-btn theme-btn" id="themeToggle" type="button" aria-pressed="false" aria-label="Switch to light mode"><svg class="ico ico-sun" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-sun"/></svg><svg class="ico ico-moon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-moon"/></svg><span id="themeLabel">Light</span></button><span class="pill"><i></i> Operator mode</span></span></header>
+    <button class="icon-btn appearance-trigger"
+  id="appearanceToggle"
+  type="button"
+  aria-label="Open appearance settings"
+  aria-expanded="false">
+  Aa
+    </button>
     <div class="notice" id="notice" role="alert" hidden><span id="noticeText"></span> <button class="text-btn" id="downloadRecovery" type="button">Download recovery copy</button></div>
 
     <section class="view active" id="view-overview">
@@ -61,8 +102,6 @@
         </div>
       </div>
       <section class="panel" id="backupPanel"><div class="panel-head"><div><b>Backup</b><p id="backupInfo">Records live only in this browser. Export a copy regularly.</p></div><div class="right"><button class="btn" id="exportBtn" type="button">Export backup</button><button class="btn" id="importBtn" type="button">Import backup</button></div></div><p class="data-msg" id="dataMsg" role="status"></p><input type="file" id="importFile" accept="application/json,.json" hidden></section>
-      
-<section class="panel appearance-panel" id="appearancePanel">
   <div class="panel-head">
     <div>
       <b>Personalize your workspace</b>
