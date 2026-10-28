@@ -727,3 +727,101 @@ html[data-theme="dark"] textarea:focus-visible {
     transition: none;
   }
 }
+
+/* ================= Phase 3E: Raised workspace surfaces ================= */
+
+/* Main sections become layered surfaces */
+html[data-theme="dark"] .panel,
+html[data-theme="dark"] .stat,
+html[data-theme="dark"] .money-card {
+  position: relative;
+  border-color: #354237;
+  background: linear-gradient(
+    145deg,
+    #222c24 0%,
+    #1b241d 48%,
+    #161d18 100%
+  );
+  box-shadow:
+    0 2px 0 rgba(255, 255, 255, .035),
+    0 7px 0 #111712,
+    0 12px 24px rgba(0, 0, 0, .22),
+    inset 0 1px 0 rgba(255, 255, 255, .07);
+  transition:
+    transform .18s ease,
+    border-color .18s ease,
+    box-shadow .18s ease;
+}
+
+/* Give the top of each section a subtle light-catching edge */
+html[data-theme="dark"] .panel-head {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, .035),
+    rgba(255, 255, 255, 0)
+  );
+  border-bottom-color: #303c32;
+}
+
+/* Smaller cards sit on top of their parent surfaces */
+html[data-theme="dark"] .discovery-card,
+html[data-theme="dark"] .quick,
+html[data-theme="dark"] .feed-card,
+html[data-theme="dark"] .operator-note {
+  border-color: #3a493b;
+  background: linear-gradient(
+    145deg,
+    #263228,
+    #1b241d
+  );
+  box-shadow:
+    0 2px 0 #121913,
+    0 5px 12px rgba(0, 0, 0, .16),
+    inset 0 1px 0 rgba(255, 255, 255, .06);
+  transition:
+    transform .18s ease,
+    border-color .18s ease,
+    box-shadow .18s ease;
+}
+
+/* Raise the cards slightly on devices with hover */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  html[data-theme="dark"] .stat:hover,
+  html[data-theme="dark"] .money-card:hover,
+  html[data-theme="dark"] .discovery-card:hover,
+  html[data-theme="dark"] .quick:hover,
+  html[data-theme="dark"] .feed-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(199, 243, 107, .35);
+    box-shadow:
+      0 3px 0 #111712,
+      0 14px 24px rgba(0, 0, 0, .24),
+      inset 0 1px 0 rgba(255, 255, 255, .09);
+  }
+}
+
+/* Keep the raised effect comfortable on mobile */
+@media (max-width: 620px) {
+  html[data-theme="dark"] .panel,
+  html[data-theme="dark"] .stat,
+  html[data-theme="dark"] .money-card {
+    box-shadow:
+      0 2px 0 rgba(255, 255, 255, .025),
+      0 5px 0 #111712,
+      0 8px 16px rgba(0, 0, 0, .18),
+      inset 0 1px 0 rgba(255, 255, 255, .06);
+  }
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme="dark"] .panel,
+  html[data-theme="dark"] .stat,
+  html[data-theme="dark"] .money-card,
+  html[data-theme="dark"] .discovery-card,
+  html[data-theme="dark"] .quick,
+  html[data-theme="dark"] .feed-card,
+  html[data-theme="dark"] .operator-note {
+    transition: none;
+  }
+}
