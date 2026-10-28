@@ -566,3 +566,75 @@ html[data-theme="dark"] .quick {
     transition: none;
   }
 }
+
+/* ================= Phase 3C: Workspace depth ================= */
+
+/* Soft environmental lighting behind the interface */
+html[data-theme="dark"] body {
+  background:
+    radial-gradient(
+      ellipse at 78% 8%,
+      rgba(145, 190, 91, .10),
+      transparent 34%
+    ),
+    radial-gradient(
+      ellipse at 8% 70%,
+      rgba(76, 120, 77, .07),
+      transparent 38%
+    ),
+    linear-gradient(135deg, #0d120e, #131a14 55%, #0d120e);
+  background-attachment: fixed;
+}
+
+/* Separate the sidebar from the workspace */
+html[data-theme="dark"] .sidebar {
+  background: linear-gradient(
+    160deg,
+    rgba(28, 37, 29, .96),
+    rgba(17, 23, 18, .98)
+  );
+  box-shadow:
+    8px 0 28px rgba(0, 0, 0, .12),
+    inset -1px 0 rgba(199, 243, 107, .06);
+}
+
+/* Give the selected navigation item a recessed surface */
+html[data-theme="dark"] .nav button.active {
+  background: linear-gradient(
+    145deg,
+    rgba(199, 243, 107, .12),
+    rgba(199, 243, 107, .045)
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .045),
+    inset 0 -1px 0 rgba(0, 0, 0, .12),
+    inset 3px 0 var(--lime);
+}
+
+/* Keep the workspace above its background */
+html[data-theme="dark"] .main {
+  position: relative;
+  isolation: isolate;
+}
+
+/* A soft light source behind the page heading */
+html[data-theme="dark"] .heading::before {
+  opacity: .85;
+  filter: blur(2px);
+}
+
+@media (max-width: 620px) {
+  html[data-theme="dark"] body {
+    background-attachment: scroll;
+  }
+
+  html[data-theme="dark"] .sidebar {
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, .20);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme="dark"] body {
+    background-attachment: scroll;
+  }
+}
