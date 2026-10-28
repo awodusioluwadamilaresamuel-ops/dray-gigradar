@@ -638,3 +638,92 @@ html[data-theme="dark"] .heading::before {
     background-attachment: scroll;
   }
 }
+
+/* ================= Phase 3D: Tactile controls ================= */
+
+/* Raised secondary buttons */
+html[data-theme="dark"] .btn:not(.primary),
+html[data-theme="dark"] .icon-btn {
+  border-color: #3b493c;
+  background: linear-gradient(
+    180deg,
+    #2b352c,
+    #202820
+  );
+  box-shadow:
+    0 3px 0 #151c16,
+    0 5px 10px rgba(0, 0, 0, .16),
+    inset 0 1px 0 rgba(255, 255, 255, .07);
+  transition:
+    transform .15s ease,
+    box-shadow .15s ease,
+    border-color .15s ease;
+}
+
+/* Give primary actions a distinct raised edge */
+html[data-theme="dark"] .btn.primary {
+  border-color: #c7f36b;
+  box-shadow:
+    0 3px 0 #83a83d,
+    0 6px 13px rgba(145, 190, 91, .15),
+    inset 0 1px 0 rgba(255, 255, 255, .45);
+  transition:
+    transform .15s ease,
+    box-shadow .15s ease,
+    filter .15s ease;
+}
+
+/* Lift buttons slightly on hover-capable devices */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  html[data-theme="dark"] .btn:not(.primary):hover,
+  html[data-theme="dark"] .icon-btn:hover {
+    transform: translateY(-1px);
+    border-color: rgba(199, 243, 107, .38);
+    box-shadow:
+      0 4px 0 #151c16,
+      0 8px 14px rgba(0, 0, 0, .20),
+      inset 0 1px 0 rgba(255, 255, 255, .08);
+  }
+
+  html[data-theme="dark"] .btn.primary:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.04);
+    box-shadow:
+      0 4px 0 #83a83d,
+      0 9px 16px rgba(145, 190, 91, .20),
+      inset 0 1px 0 rgba(255, 255, 255, .5);
+  }
+}
+
+/* Press down when tapped or clicked */
+html[data-theme="dark"] .btn:not(.primary):active,
+html[data-theme="dark"] .icon-btn:active {
+  transform: translateY(2px);
+  box-shadow:
+    0 1px 0 #151c16,
+    inset 0 1px 2px rgba(0, 0, 0, .18);
+}
+
+html[data-theme="dark"] .btn.primary:active {
+  transform: translateY(2px);
+  box-shadow:
+    0 1px 0 #83a83d,
+    inset 0 1px 2px rgba(0, 0, 0, .12);
+}
+
+/* Make keyboard focus easy to see */
+html[data-theme="dark"] button:focus-visible,
+html[data-theme="dark"] input:focus-visible,
+html[data-theme="dark"] select:focus-visible,
+html[data-theme="dark"] textarea:focus-visible {
+  outline: 2px solid #c7f36b;
+  outline-offset: 3px;
+}
+
+/* Respect accessibility preferences */
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme="dark"] .btn,
+  html[data-theme="dark"] .icon-btn {
+    transition: none;
+  }
+}
