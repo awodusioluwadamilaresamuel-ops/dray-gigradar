@@ -7,7 +7,7 @@
   const META_KEY = 'dray-gigradar-meta';          // schema version and last backup date
   const PRE_V1_KEY = 'dray-gigradar-pre-v1-copy'; // untouched copy of V0 data, made once
   const RECOVERY_KEY = 'dray-gigradar-unreadable-copy';
-  const THEME_KEY = 'dray-gigradar-theme';
+  const THEME_KEY = 'dray-gigradar-theme-v2';
   const statuses = Store.STATUSES;
 
   const $ = id => document.getElementById(id);
