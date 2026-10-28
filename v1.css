@@ -947,3 +947,104 @@ html[data-theme="dark"] .view.active .money-card {
     transition: none;
   }
 }
+
+/* ================= Phase 3G: 3D operator console ================= */
+
+/* Make the main modules feel like raised physical surfaces */
+html[data-theme="dark"] .view.active .panel,
+html[data-theme="dark"] .view.active .stat,
+html[data-theme="dark"] .view.active .money-card {
+  position: relative;
+  transform-style: preserve-3d;
+  border-color: #405541;
+  background:
+    radial-gradient(
+      ellipse at 12% 0%,
+      rgba(199, 243, 107, .075),
+      transparent 48%
+    ),
+    linear-gradient(145deg, #222d24 0%, #19221b 65%, #151c17 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .09),
+    inset 1px 0 0 rgba(199, 243, 107, .035),
+    0 2px 0 #344334,
+    0 5px 0 #111711,
+    0 13px 25px rgba(0, 0, 0, .26);
+  transition:
+    transform .2s ease,
+    border-color .2s ease,
+    box-shadow .2s ease;
+}
+
+/* Separate panel contents from the base surface */
+html[data-theme="dark"] .view.active .panel-head,
+html[data-theme="dark"] .view.active .panel-body {
+  position: relative;
+  z-index: 1;
+}
+
+/* Give smaller modules their own elevated layer */
+html[data-theme="dark"] .view.active .discovery-card,
+html[data-theme="dark"] .view.active .quick,
+html[data-theme="dark"] .view.active .feed-card,
+html[data-theme="dark"] .view.active .operator-note {
+  border-color: #405441;
+  background: linear-gradient(
+    145deg,
+    #29372b 0%,
+    #202b22 58%,
+    #19221b 100%
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .07),
+    0 2px 0 #111811,
+    0 6px 13px rgba(0, 0, 0, .19);
+}
+
+/* Interactive lift on devices with a real hover pointer */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  html[data-theme="dark"] .view.active .panel:hover,
+  html[data-theme="dark"] .view.active .stat:hover,
+  html[data-theme="dark"] .view.active .money-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(199, 243, 107, .48);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, .11),
+      0 2px 0 #3b5039,
+      0 6px 0 #111711,
+      0 19px 32px rgba(0, 0, 0, .31),
+      0 0 16px rgba(199, 243, 107, .055);
+  }
+
+  html[data-theme="dark"] .view.active .discovery-card:hover,
+  html[data-theme="dark"] .view.active .quick:hover,
+  html[data-theme="dark"] .view.active .feed-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(199, 243, 107, .42);
+  }
+}
+
+/* Keep the console comfortable on small screens */
+@media (max-width: 620px) {
+  html[data-theme="dark"] .view.active .panel,
+  html[data-theme="dark"] .view.active .stat,
+  html[data-theme="dark"] .view.active .money-card {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, .07),
+      0 2px 0 #263427,
+      0 4px 0 #111711,
+      0 9px 17px rgba(0, 0, 0, .2);
+  }
+}
+
+/* Accessibility: disable transitions when requested */
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme="dark"] .view.active .panel,
+  html[data-theme="dark"] .view.active .stat,
+  html[data-theme="dark"] .view.active .money-card,
+  html[data-theme="dark"] .view.active .discovery-card,
+  html[data-theme="dark"] .view.active .quick,
+  html[data-theme="dark"] .view.active .feed-card {
+    transition: none;
+  }
+}
