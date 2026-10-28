@@ -825,3 +825,125 @@ html[data-theme="dark"] .operator-note {
     transition: none;
   }
 }
+
+/* ================= Phase 3F: Futuristic command center ================= */
+
+/* Neon atmosphere around the active workspace */
+html[data-theme="dark"] .view.active {
+  position: relative;
+  isolation: isolate;
+}
+
+html[data-theme="dark"] .view.active::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: -35px;
+  left: -24px;
+  right: -24px;
+  height: 260px;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at 20% 8%,
+    rgba(150, 255, 75, .10),
+    transparent 65%
+  );
+}
+
+/* Futuristic illuminated section heading */
+html[data-theme="dark"] .view.active .view-title h2,
+html[data-theme="dark"] .view.active .heading h1 {
+  text-shadow: 0 0 22px rgba(199, 243, 107, .16);
+}
+
+html[data-theme="dark"] .view.active .view-title {
+  position: relative;
+  padding-left: 13px;
+}
+
+html[data-theme="dark"] .view.active .view-title::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 3px;
+  bottom: 4px;
+  width: 3px;
+  border-radius: 5px;
+  background: #c7f36b;
+  box-shadow:
+    0 0 8px rgba(199, 243, 107, .85),
+    0 0 20px rgba(199, 243, 107, .35);
+}
+
+/* Give active workspace panels a neon-lit upper edge */
+html[data-theme="dark"] .view.active .panel {
+  border-color: #394b3b;
+  box-shadow:
+    0 2px 0 rgba(255, 255, 255, .04),
+    0 7px 0 #101610,
+    0 12px 26px rgba(0, 0, 0, .24),
+    inset 0 1px 0 rgba(199, 243, 107, .09);
+}
+
+html[data-theme="dark"] .view.active .panel::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 12%;
+  width: 38%;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(199, 243, 107, .8),
+    transparent
+  );
+  box-shadow: 0 0 9px rgba(199, 243, 107, .22);
+}
+
+/* Turn the selected navigation item into a glowing control */
+html[data-theme="dark"] .nav button.active {
+  position: relative;
+  color: #d8ff9b;
+  border: 1px solid rgba(199, 243, 107, .24);
+  background: linear-gradient(
+    110deg,
+    rgba(199, 243, 107, .17),
+    rgba(199, 243, 107, .035)
+  );
+  box-shadow:
+    inset 3px 0 #c7f36b,
+    inset 0 1px 0 rgba(255, 255, 255, .06),
+    0 0 18px rgba(145, 190, 91, .07);
+}
+
+/* Stronger neon edge for the smaller floating cards */
+html[data-theme="dark"] .view.active .discovery-card,
+html[data-theme="dark"] .view.active .stat,
+html[data-theme="dark"] .view.active .money-card {
+  border-color: #3a4b3b;
+}
+
+/* Mobile-safe lighting and readable surfaces */
+@media (max-width: 620px) {
+  html[data-theme="dark"] .view.active::before {
+    left: -10px;
+    right: -10px;
+    top: -20px;
+    height: 210px;
+  }
+
+  html[data-theme="dark"] .view.active .panel::before {
+    width: 32%;
+  }
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme="dark"] .view.active .panel,
+  html[data-theme="dark"] .view.active .stat,
+  html[data-theme="dark"] .view.active .money-card {
+    transition: none;
+  }
+}
