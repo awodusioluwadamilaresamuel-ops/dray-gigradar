@@ -434,3 +434,32 @@ html[data-theme="light"] .fab {
     transition: none;
   }
 }
+
+/* ================= Phase 3A: Mobile usability ================= */
+
+/* Remove the floating button that covers dashboard content.
+   Keep Add Lead accessible from the Leads and Pipeline views. */
+@media (max-width: 620px) {
+  .fab {
+    display: none !important;
+  }
+
+  .toolbar #addList,
+  #addPipe {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .toolbar #addList {
+    flex: 1 1 100%;
+  }
+
+  #addPipe {
+    flex: none;
+  }
+
+  .main {
+    padding-bottom: 100px;
+  }
+}
