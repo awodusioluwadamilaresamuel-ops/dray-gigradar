@@ -206,3 +206,107 @@ html[data-theme="dark"] .btn.primary {
     transition: none;
   }
 }
+
+/* ===== GigRadar: Natural 3D Interface ===== */
+
+html[data-theme="light"] body {
+  background:
+    radial-gradient(ellipse at 12% 8%, rgba(185, 224, 139, .48), transparent 34%),
+    radial-gradient(ellipse at 88% 24%, rgba(113, 190, 146, .24), transparent 32%),
+    linear-gradient(145deg, #f7faf2, #e9f1e3 52%, #f8faf5);
+  background-attachment: fixed;
+}
+
+html[data-theme="light"] .panel,
+html[data-theme="light"] .stat,
+html[data-theme="light"] .money-card,
+html[data-theme="light"] .feed-card,
+html[data-theme="light"] .discovery-card {
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, .96),
+    rgba(244, 249, 239, .88)
+  );
+  border: 1px solid rgba(104, 137, 86, .23);
+  border-radius: 18px;
+  box-shadow:
+    0 2px 4px rgba(43, 65, 35, .025),
+    0 12px 26px rgba(43, 65, 35, .075),
+    inset 0 1px 0 rgba(255, 255, 255, .95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition:
+    transform .22s ease,
+    box-shadow .22s ease,
+    border-color .22s ease;
+}
+
+html[data-theme="light"] .panel-head {
+  background: linear-gradient(
+    100deg,
+    rgba(233, 243, 224, .8),
+    rgba(255, 255, 255, .55)
+  );
+}
+
+html[data-theme="light"] .sidebar {
+  background: rgba(250, 252, 247, .88);
+  border-right: 1px solid rgba(104, 137, 86, .2);
+  box-shadow: 8px 0 32px rgba(43, 65, 35, .035);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+html[data-theme="light"] .stat {
+  border-top: 3px solid rgba(121, 177, 72, .75);
+}
+
+html[data-theme="light"] .nav button.active {
+  background: linear-gradient(115deg, #e4f2d6, #f2f8eb);
+  color: #315b20;
+  box-shadow:
+    inset 3px 0 #78ad45,
+    0 4px 12px rgba(68, 104, 43, .07);
+}
+
+html[data-theme="light"] .btn.primary,
+html[data-theme="light"] .brand-mark {
+  background: linear-gradient(135deg, #d9fa98, #aee052);
+  border-color: #a5cf54;
+  box-shadow:
+    0 4px 0 #90bd42,
+    0 8px 18px rgba(93, 137, 43, .18);
+}
+
+html[data-theme="light"] .btn.primary:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #90bd42;
+}
+
+html[data-theme="light"] .operator-note {
+  background: linear-gradient(145deg, #f0f8e7, #e2efd4);
+  border-color: #c4dca9;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .85);
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  html[data-theme="light"] .panel:hover,
+  html[data-theme="light"] .stat:hover,
+  html[data-theme="light"] .money-card:hover,
+  html[data-theme="light"] .discovery-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(104, 154, 65, .42);
+    box-shadow:
+      0 18px 34px rgba(43, 65, 35, .11),
+      inset 0 1px 0 rgba(255, 255, 255, .98);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme="light"] .panel,
+  html[data-theme="light"] .stat,
+  html[data-theme="light"] .money-card,
+  html[data-theme="light"] .discovery-card {
+    transition: none;
+  }
+}
